@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full bg-slate-950 text-slate-100">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SOIT 2027 Executive Election - Official Voting Portal</title>
+
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              red: '#991B1B',
+              redDark: '#450A0A',
+              redHover: '#B91C1C',
+              crimson: '#DC2626',
+              gold: '#D4AF37',
+              goldHover: '#B89528',
+              darkBg: '#08080A',
+              cardBg: '#121318',
+              borderDark: '#262833'
+            }
+          },
+          fontFamily: {
+            sans: ['Inter', 'sans-serif']
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+    
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: #050508;
+    }
+
+    /* Subtle Animated Radial Background Glow */
+    .hero-glow {
+      background: radial-gradient(circle at 50% 20%, rgba(185, 28, 28, 0.22) 0%, rgba(5, 5, 8, 0.95) 70%);
+    }
+
+    .glass-panel {
+      background: rgba(18, 19, 24, 0.75);
+      backdrop-filter: blur(16px);
+      border: 1px solid rgba(212, 175, 55, 0.15);
+    }
+
+    .glass-panel-hover {
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .glass-panel-hover:hover {
+      border-color: rgba(212, 175, 55, 0.4);
+      transform: translateY(-2px);
+      box-shadow: 0 10px 30px -10px rgba(185, 28, 28, 0.3);
+    }
+
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar {
+      width: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #050508;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #991B1B;
+      border-radius: 4px;
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col antialiased text-slate-100 bg-slate-950 hero-glow selection:bg-brand-red selection:text-white">
+
+  <header class="w-full border-b border-brand-borderDark/80 bg-slate-950/80 backdrop-blur-md sticky top-0 z-40">
+    <!-- Top Micro Announcement Bar -->
+    <div class="bg-gradient-to-r from-brand-redDark via-brand-red to-slate-950 px-4 py-1.5 text-center text-xs font-semibold text-slate-200 border-b border-brand-gold/20 flex items-center justify-center gap-2">
+      <span class="inline-block w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+      <span id="announcement-text">Official Executive Election Portal - School of Information Technology</span>
+    </div>
+
+    <!-- Main Header Navbar -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex items-center justify-between">
+      
+      <!-- Brand Name -->
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-xl bg-brand-redDark/80 border border-brand-gold/40 flex items-center justify-center text-brand-gold shadow-lg">
+          <i data-lucide="vote" class="w-5 h-5"></i>
+        </div>
+        <div>
+          <span class="text-xs uppercase tracking-widest font-extrabold text-brand-gold block">IBSUniversity</span>
+          <span class="text-sm font-black text-white tracking-tight">Techminds Association</span>
+        </div>
+      </div>
+
+      <!-- Quick Admin Navigation Link -->
+      <a 
+        href="admin_voting_dashboard.html" 
+        class="inline-flex items-center gap-2 text-xs font-semibold text-slate-400 hover:text-white bg-slate-900 hover:bg-slate-800 border border-slate-800 hover:border-slate-700 px-3.5 py-1.5 rounded-xl transition duration-200"
+      >
+        <i data-lucide="lock" class="w-3.5 h-3.5 text-brand-gold"></i>
+        <span>Admin Portal</span>
+      </a>
+
+    </div>
+  </header>
+
+  <main class="flex-1 max-w-6xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-14 flex flex-col justify-center space-y-12">
+
+    <!-- ========================================== -->
+    <!-- SECTION 1: LOGO & BRANDING TRIPLE GRID     -->
+    <!-- ========================================== -->
+    <section class="glass-panel rounded-2xl p-6 sm:p-8 text-center relative overflow-hidden shadow-2xl">
+      <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-brand-red via-brand-gold to-brand-red"></div>
+      
+      <p class="text-[11px] font-extrabold uppercase tracking-widest text-brand-gold mb-6">In Association With Partner Institutions</p>
+
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-6 items-center justify-items-center">
+        
+        <!-- Logo Container 1: Main Event Logo -->
+        <div class="w-full max-w-[200px] h-24 bg-slate-900/80 border border-slate-800 hover:border-brand-gold/40 rounded-xl p-3 flex flex-col items-center justify-center transition group shadow-inner">
+          <img 
+            id="logo-1-img" 
+            src="Images/ibsu.png" 
+            alt="Main Event Logo" 
+            class="max-h-16 w-auto object-contain transition duration-300 group-hover:scale-105"
+            onerror="this.onerror=null; this.src='https://placehold.co/200x80/1a1a24/D4AF37?text=IBSUniversity';"
+          />
+          <span class="text-[9px] uppercase font-bold text-slate-400 mt-1">IBS University</span>
+        </div>
+
+        <!-- Logo Container 2: Supporting Organization / TSA Logo -->
+        <div class="w-full max-w-[200px] h-24 bg-slate-900/80 border border-slate-800 hover:border-brand-gold/40 rounded-xl p-3 flex flex-col items-center justify-center transition group shadow-inner">
+          <img 
+            id="logo-2-img" 
+            src="Images/techminds.jpeg" 
+            alt="Supporting Organization Logo" 
+            class="max-h-16 w-auto object-contain transition duration-300 group-hover:scale-105"
+            onerror="this.onerror=null; this.src='https://placehold.co/200x80/1a1a24/DC2626?text=Techminds+TSA';"
+          />
+          <span class="text-[9px] uppercase font-bold text-slate-400 mt-1">Techminds Student Association</span>
+        </div>
+
+        <!-- Logo Container 3: Partner University / Sponsor Logo -->
+        <div class="w-full max-w-[200px] h-24 bg-slate-900/80 border border-slate-800 hover:border-brand-gold/40 rounded-xl p-3 flex flex-col items-center justify-center transition group shadow-inner">
+          <img 
+            id="logo-3-img" 
+            src="Images/southerncrossuniversity.jpeg" 
+            alt="Partner Institution Logo" 
+            class="max-h-16 w-auto object-contain transition duration-300 group-hover:scale-105"
+            onerror="this.onerror=null; this.src='https://placehold.co/200x80/1a1a24/D4AF37?text=Southern+Cross+Uni';"
+          />
+          <span class="text-[9px] uppercase font-bold text-slate-400 mt-1">Southern Cross University</span>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ========================================== -->
+    <!-- SECTION 2: HERO EVENT HEADINGS             -->
+    <!-- ========================================== -->
+    <section class="text-center space-y-6 max-w-3xl mx-auto">
+      
+      <!-- Event Category Pill -->
+      <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-brand-redDark/60 border border-brand-red/40 text-xs font-bold text-brand-gold shadow-lg">
+        <i data-lucide="shield-check" class="w-4 h-4 text-brand-gold"></i>
+        <span id="event-tag">Official Student Ballot Portal</span>
+      </div>
+
+      <!-- Main Heading Title -->
+      <h1 id="event-title" class="text-3xl sm:text-5xl font-black text-white tracking-tight leading-tight uppercase">
+        Techminds Association <br />
+        <span class="bg-gradient-to-r from-brand-gold via-yellow-200 to-brand-gold bg-clip-text text-transparent">
+          2027 Executive Election
+        </span>
+      </h1>
+
+      <!-- Subtitle Description -->
+      <p id="event-description" class="text-sm sm:text-base text-slate-300 leading-relaxed font-normal">
+        Welcome to the official online voting system for the School of Information Technology. Cast your vote to select your student leadership team across all four executive positions.
+      </p>
+
+      <!-- Clear Voting Instruction Badge -->
+      <div class="inline-flex items-center gap-2 text-xs font-medium bg-slate-900/90 px-4 py-2 rounded-xl border border-slate-800 text-slate-300">
+        <i data-lucide="info" class="w-4 h-4 text-brand-gold"></i>
+        <span id="event-instruction">Select your candidates and submit your vote securely. Exactly 1 vote per position allowed.</span>
+      </div>
+
+    </section>
+
+    <!-- ========================================== -->
+    <!-- SECTION 3: NAVIGATION ACTIONS (BUTTONS)    -->
+    <!-- ========================================== -->
+    <section class="flex flex-col sm:flex-row items-center justify-center gap-5 pt-2">
+      
+      <!-- PRIMARY ACTION: Cast Your Vote -->
+      <a 
+        id="link-cast-vote" 
+        href="soit_2027_election_voting_page.html" 
+        class="w-full sm:w-auto min-w-[260px] group relative inline-flex items-center justify-center gap-3 bg-gradient-to-r from-brand-red via-red-600 to-brand-red hover:from-brand-redHover hover:to-red-700 text-white font-black text-base px-8 py-4 rounded-2xl shadow-xl shadow-brand-red/30 hover:shadow-brand-red/50 border border-brand-gold/40 transition duration-300 transform hover:-translate-y-0.5 text-center"
+      >
+        <i data-lucide="vote" class="w-6 h-6 text-brand-gold group-hover:scale-110 transition"></i>
+        <span>Cast Your Vote</span>
+        <i data-lucide="arrow-right" class="w-5 h-5 text-slate-200 group-hover:translate-x-1 transition"></i>
+      </a>
+
+      <!-- SECONDARY ACTION: Admin Login -->
+      <a 
+        id="link-admin-login" 
+        href="admin_voting_dashboard.html" 
+        class="w-full sm:w-auto min-w-[220px] inline-flex items-center justify-center gap-2.5 bg-slate-900/90 hover:bg-slate-800/90 text-slate-200 hover:text-white font-bold text-sm px-6 py-4 rounded-2xl border border-slate-800 hover:border-slate-700 transition duration-200 text-center shadow-lg"
+      >
+        <i data-lucide="user-check" class="w-5 h-5 text-brand-gold"></i>
+        <span>Admin Portal Login</span>
+      </a>
+
+    </section>
+
+    <!-- ========================================== -->
+    <!-- SECTION 4: ELECTION FEATURES & HIGHLIGHTS  -->
+    <!-- ========================================== -->
+    <section class="grid grid-cols-1 md:grid-cols-3 gap-6 pt-6">
+      
+      <!-- Feature Card 1 -->
+      <div class="glass-panel glass-panel-hover p-6 rounded-2xl space-y-3">
+        <div class="w-10 h-10 rounded-xl bg-brand-redDark border border-brand-red/50 text-brand-gold flex items-center justify-center">
+          <i data-lucide="lock" class="w-5 h-5"></i>
+        </div>
+        <h3 class="text-base font-bold text-white">Encrypted & Anonymous</h3>
+        <p class="text-xs text-slate-400 leading-relaxed">
+          Your voter choices remain strictly anonymous and encrypted. Verification ensures only authorized SOIT students can submit ballots.
+        </p>
+      </div>
+
+      <!-- Feature Card 2 -->
+      <div class="glass-panel glass-panel-hover p-6 rounded-2xl space-y-3">
+        <div class="w-10 h-10 rounded-xl bg-brand-redDark border border-brand-red/50 text-brand-gold flex items-center justify-center">
+          <i data-lucide="database" class="w-5 h-5"></i>
+        </div>
+        <h3 class="text-base font-bold text-white">Live Realtime Sync</h3>
+        <p class="text-xs text-slate-400 leading-relaxed">
+          Ballots are recorded instantly into the official Google Sheet database via automated Google Apps Script API endpoints.
+        </p>
+      </div>
+
+      <!-- Feature Card 3 -->
+      <div class="glass-panel glass-panel-hover p-6 rounded-2xl space-y-3">
+        <div class="w-10 h-10 rounded-xl bg-brand-redDark border border-brand-red/50 text-brand-gold flex items-center justify-center">
+          <i data-lucide="user-x" class="w-5 h-5"></i>
+        </div>
+        <h3 class="text-base font-bold text-white">1 Vote Per Student</h3>
+        <p class="text-xs text-slate-400 leading-relaxed">
+          Strict duplicate submission protection prevents multiple entries, ensuring fair and accurate electoral results.
+        </p>
+      </div>
+
+    </section>
+
+    <!-- ========================================== -->
+    <!-- SECTION 5: 3-STEP VOTING PROCESS           -->
+    <!-- ========================================== -->
+    <section class="glass-panel p-6 sm:p-8 rounded-2xl space-y-6">
+      <div class="text-center space-y-1">
+        <h2 class="text-lg font-bold text-white">How To Cast Your Vote</h2>
+        <p class="text-xs text-slate-400">Simple three-step voting procedure for SOIT students</p>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-6 relative">
+        <!-- Step 1 -->
+        <div class="bg-slate-900/80 border border-slate-800 p-5 rounded-xl text-center space-y-2">
+          <div class="w-8 h-8 rounded-full bg-brand-red text-white font-extrabold text-xs flex items-center justify-center mx-auto border border-brand-gold/40">
+            1
+          </div>
+          <h4 class="text-xs font-bold text-white uppercase tracking-wider">Verify Identity</h4>
+          <p class="text-[11px] text-slate-400">Enter your official Student ID Number and Email address on the ballot page.</p>
+        </div>
+
+        <!-- Step 2 -->
+        <div class="bg-slate-900/80 border border-slate-800 p-5 rounded-xl text-center space-y-2">
+          <div class="w-8 h-8 rounded-full bg-brand-red text-white font-extrabold text-xs flex items-center justify-center mx-auto border border-brand-gold/40">
+            2
+          </div>
+          <h4 class="text-xs font-bold text-white uppercase tracking-wider">Select Candidates</h4>
+          <p class="text-[11px] text-slate-400">Review candidate manifestos and choose 1 nominee for each executive category.</p>
+        </div>
+
+        <!-- Step 3 -->
+        <div class="bg-slate-900/80 border border-slate-800 p-5 rounded-xl text-center space-y-2">
+          <div class="w-8 h-8 rounded-full bg-brand-red text-white font-extrabold text-xs flex items-center justify-center mx-auto border border-brand-gold/40">
+            3
+          </div>
+          <h4 class="text-xs font-bold text-white uppercase tracking-wider">Submit & Receipt</h4>
+          <p class="text-[11px] text-slate-400">Confirm your final selections to transmit your ballot and get your session receipt.</p>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="w-full border-t border-slate-800 bg-slate-950 py-8 mt-auto">
+    <div class="max-w-6xl mx-auto px-4 text-center space-y-4">
+      <div class="flex items-center justify-center gap-3">
+        <div class="w-7 h-7 rounded-lg bg-brand-redDark border border-brand-gold/40 flex items-center justify-center text-brand-gold text-xs font-bold">
+          <i data-lucide="vote" class="w-4 h-4"></i>
+        </div>
+        <span class="text-xs font-bold text-slate-300">IBSUniversity • School of Information Technology</span>
+      </div>
+      <p id="footer-text" class="text-xs text-slate-500 max-w-md mx-auto">
+        Techminds Student Association 2027 Executive Election. Powered by Google Apps Script & GitHub Pages.
+      </p>
+      <p class="text-[10px] text-slate-600 font-mono">
+        © 2027 SOIT Election Committee. All rights reserved.
+      </p>
+      <p class="text-[10px] text-slate-600 font-mono">
+        Built and deployed by DEVEH
+      </p>
+    </div>
+  </footer>
+
+  <script>
+    /*
+     * MODULAR LANDING PAGE CONFIGURATION
+     * Easily customize titles, slogans, logo URLs, and target links without changing the layout.
+     */
+    const siteConfig = {
+      title: "Techminds Association <br /><span class='bg-gradient-to-r from-brand-gold via-yellow-200 to-brand-gold bg-clip-text text-transparent'>2027 Executive Election</span>",
+      description: "Welcome to the official online voting system for the School of Information Technology. Cast your vote to select your student leadership team across all four executive positions.",
+      instruction: "Select your candidates and submit your vote securely. Exactly 1 vote per position allowed.",
+      votingPageLink: "soit_2027_election_voting_page.html",
+      adminPageLink: "admin_voting_dashboard.html",
+      logos: {
+        logo1: "https://placehold.co/200x80/1a1a24/D4AF37?text=IBSUniversity",
+        logo2: "https://placehold.co/200x80/1a1a24/DC2626?text=Techminds+TSA",
+        logo3: "https://placehold.co/200x80/1a1a24/D4AF37?text=Southern+Cross+Uni"
+      }
+    };
+
+    window.addEventListener('DOMContentLoaded', () => {
+      // Initialize Lucide SVG Icons
+      lucide.createIcons();
+
+      // Apply Modular Config Overrides if required
+      if (siteConfig.votingPageLink) {
+        document.getElementById('link-cast-vote').href = siteConfig.votingPageLink;
+      }
+      if (siteConfig.adminPageLink) {
+        document.getElementById('link-admin-login').href = siteConfig.adminPageLink;
+      }
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,1185 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full bg-slate-950 text-slate-100">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Voting System - Admin Portal</title>
+  
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#f0f7ff',
+              100: '#e0effe',
+              500: '#3b82f6',
+              600: '#2563eb',
+              700: '#1d4ed8',
+              900: '#1e3a8a',
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+    body { font-family: 'Inter', sans-serif; }
+    
+    .glass-card {
+      background: rgba(30, 41, 59, 0.7);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    
+    /* Custom Scrollbars */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: rgba(15, 23, 42, 0.6);
+    }
+    ::-webkit-scrollbar-thumb {
+      background: rgba(51, 65, 85, 0.8);
+      border-radius: 4px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: rgba(71, 85, 105, 1);
+    }
+  </style>
+</head>
+<body class="h-full flex flex-col font-sans antialiased text-slate-200 bg-slate-950">
+
+  <div id="app" class="flex-1 flex flex-col min-h-screen">
+
+    <!-- Global Top Alert Banner for Connection Status -->
+    <div id="demo-mode-banner" class="bg-amber-500/10 border-b border-amber-500/20 px-4 py-2 text-xs text-amber-300 flex items-center justify-between">
+      <div class="flex items-center gap-2">
+        <i data-lucide="info" class="w-4 h-4 text-amber-400"></i>
+        <span><strong>Live Backend:</strong> <span id="current-mode-label" class="underline font-semibold">Google Apps Script Live Mode</span>.</span>
+      </div>
+      <a href="index.html" class="bg-slate-900/40 hover:bg-slate-900/70 text-amber-200 px-2.5 py-1 rounded transition text-xs font-medium flex items-center gap-1">
+        <i data-lucide="home" class="w-3.5 h-3.5"></i> Home
+      </a>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- SECTION 1: AUTHENTICATION / LOGIN SCREEN -->
+    <!-- ========================================== -->
+    <section id="view-login" class="flex-1 flex items-center justify-center p-4 relative overflow-hidden">
+      <!-- Background Glow Effects -->
+      <div class="absolute -top-40 -left-40 w-96 h-96 bg-blue-600/20 rounded-full blur-3xl pointer-events-none"></div>
+      <div class="absolute -bottom-40 -right-40 w-96 h-96 bg-indigo-600/20 rounded-full blur-3xl pointer-events-none"></div>
+
+      <div class="w-full max-w-md glass-card rounded-2xl p-8 shadow-2xl relative z-10">
+        <div class="text-center mb-8">
+          <div class="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-blue-600/20 text-blue-400 border border-blue-500/30 mb-4 shadow-lg shadow-blue-500/10">
+            <i data-lucide="vote" class="w-8 h-8"></i>
+          </div>
+          <h1 class="text-2xl font-bold tracking-tight text-white">Admin Authentication</h1>
+          <p class="text-xs text-slate-400 mt-1">Google Sheets Powered Secure Voting System</p>
+        </div>
+
+        <!-- Alert Notification Box -->
+        <div id="login-alert" class="hidden mb-6 p-3 rounded-lg text-xs flex items-center gap-2 border"></div>
+
+        <form id="login-form" onsubmit="handleLogin(event)" class="space-y-5">
+          <div>
+            <label class="block text-xs font-semibold uppercase tracking-wider text-slate-300 mb-1">Admin Username</label>
+            <div class="relative">
+              <i data-lucide="user" class="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"></i>
+              <input 
+                type="text" 
+                id="admin-username" 
+                required 
+                autocomplete="username"
+                placeholder="Enter admin username"
+                class="w-full bg-slate-900/90 border border-slate-700/80 rounded-xl py-2.5 pl-10 text-sm text-white focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition"
+              />
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-xs font-semibold uppercase tracking-wider text-slate-300 mb-1">Admin Passcode</label>
+            <div class="relative">
+              <i data-lucide="lock" class="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"></i>
+              <input 
+                type="password" 
+                id="admin-password" 
+                required 
+                autocomplete="current-password"
+                placeholder="Enter admin password"
+                class="w-full bg-slate-900/90 border border-slate-700/80 rounded-xl py-2.5 pl-10 pr-10 text-sm text-white focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition"
+              />
+              <button 
+                type="button" 
+                onclick="togglePasswordVisibility()" 
+                class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-200 text-xs"
+              >
+                <i id="eye-icon" data-lucide="eye" class="w-4 h-4"></i>
+              </button>
+            </div>
+          </div>
+
+          <button 
+            type="submit" 
+            id="login-btn"
+            class="w-full bg-blue-600 hover:bg-blue-500 text-white font-medium py-2.5 rounded-xl transition shadow-lg shadow-blue-600/25 flex items-center justify-center gap-2"
+          >
+            <i data-lucide="shield-check" class="w-4 h-4"></i> Authenticate & Open Portal
+          </button>
+        </form>
+
+      </div>
+    </section>
+
+    <!-- ========================================== -->
+    <!-- SECTION 2: ADMIN DASHBOARD INTERFACE       -->
+    <!-- ========================================== -->
+    <div id="view-dashboard" class="hidden flex-1 flex flex-col md:flex-row min-h-screen">
+      
+      <!-- Sidebar Navigation -->
+      <aside class="w-full md:w-64 glass-card border-r border-slate-800 flex flex-col shrink-0">
+        <div class="p-5 border-b border-slate-800 flex items-center justify-between">
+          <div class="flex items-center gap-3">
+            <div class="w-9 h-9 rounded-xl bg-blue-600/20 border border-blue-500/40 text-blue-400 flex items-center justify-center font-bold">
+              <i data-lucide="vote" class="w-5 h-5"></i>
+            </div>
+            <div>
+              <h2 class="text-sm font-bold text-white leading-none">VoteAdmin</h2>
+              <span class="text-[10px] text-slate-400 font-mono">v2.4 GAS Live</span>
+            </div>
+          </div>
+          <button onclick="logout()" title="Logout" class="md:hidden text-slate-400 hover:text-rose-400">
+            <i data-lucide="log-out" class="w-5 h-5"></i>
+          </button>
+        </div>
+
+        <nav class="flex-1 p-4 space-y-1.5">
+          <button onclick="switchTab('analytics')" id="nav-analytics" class="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-medium bg-blue-600/20 text-blue-400 border border-blue-500/30">
+            <i data-lucide="layout-dashboard" class="w-4 h-4"></i> Realtime Analytics
+          </button>
+          <button onclick="switchTab('records')" id="nav-records" class="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-medium text-slate-400 hover:bg-slate-900/60 hover:text-slate-200">
+            <i data-lucide="table" class="w-4 h-4"></i> Live Vote Logs
+          </button>
+          <button onclick="switchTab('setup')" id="nav-setup" class="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-medium text-slate-400 hover:bg-slate-900/60 hover:text-slate-200">
+            <i data-lucide="code-2" class="w-4 h-4"></i> Apps Script & Deploy
+          </button>
+        </nav>
+
+        <!-- System Quick Control Widget in Sidebar -->
+        <div class="p-4 m-4 rounded-xl bg-slate-900/90 border border-slate-800 space-y-3">
+          <div class="flex items-center justify-between text-xs">
+            <span class="text-slate-400 font-medium">Auto-Sync</span>
+            <span id="sync-timer" class="font-mono text-blue-400 font-semibold">10s</span>
+          </div>
+          <div class="w-full bg-slate-800 rounded-full h-1.5 overflow-hidden">
+            <div id="sync-progress" class="bg-blue-500 h-full w-full transition-all duration-1000 ease-linear"></div>
+          </div>
+          <button onclick="fetchLatestData(true)" class="w-full py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-lg text-xs font-medium transition flex items-center justify-center gap-1.5">
+            <i data-lucide="refresh-cw" id="manual-refresh-icon" class="w-3.5 h-3.5"></i> Refresh Now
+          </button>
+        </div>
+
+        <!-- User Info / Logout -->
+        <div class="p-4 border-t border-slate-800 hidden md:flex items-center justify-between">
+          <div class="flex items-center gap-2">
+            <div class="w-8 h-8 rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center text-xs font-bold text-slate-300">
+              AD
+            </div>
+            <div class="overflow-hidden">
+              <p class="text-xs font-semibold text-white truncate">Administrator</p>
+              <p class="text-[10px] text-slate-400 truncate">Authenticated Token</p>
+            </div>
+          </div>
+          <button onclick="logout()" class="text-slate-400 hover:text-rose-400 transition" title="Log Out">
+            <i data-lucide="log-out" class="w-4 h-4"></i>
+          </button>
+        </div>
+      </aside>
+
+      <!-- Main Dashboard Content Area -->
+      <main class="flex-1 flex flex-col overflow-y-auto">
+        
+        <!-- Header Toolbar -->
+        <header class="glass-card sticky top-0 z-20 border-b border-slate-800 px-6 py-4 flex flex-wrap items-center justify-between gap-4">
+          <div>
+            <h1 class="text-lg font-bold text-white flex items-center gap-2">
+              <span>Election Control Center</span>
+              <span id="connection-badge" class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/30">
+                <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                LIVE CONNECTED
+              </span>
+            </h1>
+            <p class="text-xs text-slate-400">Last synchronized: <span id="last-updated-text" class="text-slate-300 font-mono">Just now</span></p>
+          </div>
+
+          <!-- Top Toolbar Actions -->
+          <div class="flex items-center gap-2">
+            <button onclick="exportResultsPDF()" class="bg-rose-600/20 hover:bg-rose-600/30 text-rose-300 border border-rose-500/30 px-3 py-1.5 rounded-xl text-xs font-medium transition flex items-center gap-1.5">
+              <i data-lucide="file-text" class="w-3.5 h-3.5"></i> Export Results PDF
+            </button>
+            <button onclick="exportDataCSV()" class="bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 px-3 py-1.5 rounded-xl text-xs font-medium transition flex items-center gap-1.5">
+              <i data-lucide="download" class="w-3.5 h-3.5"></i> Export CSV
+            </button>
+          </div>
+        </header>
+
+        <!-- Dashboard View 1: Analytics -->
+        <div id="tab-analytics" class="p-6 space-y-6">
+          
+          <!-- Key Metrics Cards -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <!-- Card 1: Total Votes -->
+            <div class="glass-card p-5 rounded-2xl border border-slate-800 relative overflow-hidden">
+              <div class="flex items-center justify-between">
+                <span class="text-xs font-medium text-slate-400 uppercase tracking-wider">Total Votes Cast</span>
+                <div class="p-2 bg-blue-500/10 text-blue-400 rounded-xl border border-blue-500/20">
+                  <i data-lucide="vote" class="w-5 h-5"></i>
+                </div>
+              </div>
+              <div class="mt-3">
+                <span id="metric-total-votes" class="text-3xl font-extrabold text-white">0</span>
+                <span id="metric-vote-growth" class="ml-2 text-xs text-emerald-400 font-medium">↑ Realtime</span>
+              </div>
+              <p class="text-[11px] text-slate-400 mt-1">Total recorded ballots in sheet</p>
+            </div>
+
+            <!-- Card 2: Leading Candidate -->
+            <div class="glass-card p-5 rounded-2xl border border-slate-800 relative overflow-hidden">
+              <div class="flex items-center justify-between">
+                <span class="text-xs font-medium text-slate-400 uppercase tracking-wider">Front Runner</span>
+                <div class="p-2 bg-amber-500/10 text-amber-400 rounded-xl border border-amber-500/20">
+                  <i data-lucide="trophy" class="w-5 h-5"></i>
+                </div>
+              </div>
+              <div class="mt-3">
+                <span id="metric-leading-candidate" class="text-xl font-bold text-white truncate block">--</span>
+              </div>
+              <p id="metric-leading-votes" class="text-[11px] text-slate-400 mt-1">0 votes (0%)</p>
+            </div>
+
+            <!-- Card 3: Active Positions -->
+            <div class="glass-card p-5 rounded-2xl border border-slate-800 relative overflow-hidden">
+              <div class="flex items-center justify-between">
+                <span class="text-xs font-medium text-slate-400 uppercase tracking-wider">Electoral Races</span>
+                <div class="p-2 bg-purple-500/10 text-purple-400 rounded-xl border border-purple-500/20">
+                  <i data-lucide="layers" class="w-5 h-5"></i>
+                </div>
+              </div>
+              <div class="mt-3">
+                <span id="metric-positions-count" class="text-3xl font-extrabold text-white">0</span>
+              </div>
+              <p class="text-[11px] text-slate-400 mt-1">Active voting categories</p>
+            </div>
+
+            <!-- Card 4: System Status -->
+            <div class="glass-card p-5 rounded-2xl border border-slate-800 relative overflow-hidden">
+              <div class="flex items-center justify-between">
+                <span class="text-xs font-medium text-slate-400 uppercase tracking-wider">Backend API</span>
+                <div class="p-2 bg-emerald-500/10 text-emerald-400 rounded-xl border border-emerald-500/20">
+                  <i data-lucide="activity" class="w-5 h-5"></i>
+                </div>
+              </div>
+              <div class="mt-3 flex items-center gap-2">
+                <span id="metric-api-status" class="text-lg font-bold text-emerald-400">Active</span>
+              </div>
+              <p id="metric-sheet-info" class="text-[11px] text-slate-400 mt-1">Latency ~180ms</p>
+            </div>
+
+            <!-- Card 5: Total Candidates -->
+            <div class="glass-card p-5 rounded-2xl border border-slate-800 relative overflow-hidden">
+              <div class="flex items-center justify-between">
+                <span class="text-xs font-medium text-slate-400 uppercase tracking-wider">Total Candidates</span>
+                <div class="p-2 bg-cyan-500/10 text-cyan-400 rounded-xl border border-cyan-500/20">
+                  <i data-lucide="users" class="w-5 h-5"></i>
+                </div>
+              </div>
+              <div class="mt-3">
+                <span id="metric-candidates-count" class="text-3xl font-extrabold text-white">0</span>
+              </div>
+              <p class="text-[11px] text-slate-400 mt-1">Candidates receiving votes</p>
+            </div>
+
+            <!-- Card 6: Votes Today -->
+            <div class="glass-card p-5 rounded-2xl border border-slate-800 relative overflow-hidden">
+              <div class="flex items-center justify-between">
+                <span class="text-xs font-medium text-slate-400 uppercase tracking-wider">Votes Today</span>
+                <div class="p-2 bg-rose-500/10 text-rose-400 rounded-xl border border-rose-500/20">
+                  <i data-lucide="calendar-check" class="w-5 h-5"></i>
+                </div>
+              </div>
+              <div class="mt-3">
+                <span id="metric-votes-today" class="text-3xl font-extrabold text-white">0</span>
+              </div>
+              <p class="text-[11px] text-slate-400 mt-1">Ballots recorded today</p>
+            </div>
+          </div>
+
+          <!-- Position Filter Bar -->
+          <div class="flex items-center justify-between gap-4 bg-slate-900/60 p-3 rounded-2xl border border-slate-800">
+            <span class="text-xs font-medium text-slate-300 flex items-center gap-2">
+              <i data-lucide="filter" class="w-4 h-4 text-blue-400"></i> Filter Visualizations by Position:
+            </span>
+            <select id="position-filter-select" onchange="handlePositionFilterChange()" class="bg-slate-950 border border-slate-700 text-xs text-white rounded-xl px-3 py-1.5 focus:outline-none focus:border-blue-500">
+              <option value="ALL">All Positions</option>
+            </select>
+          </div>
+
+          <!-- Dynamic Category Leaderboards -->
+          <section class="space-y-4" aria-labelledby="leaderboards-title">
+            <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-2">
+              <div>
+                <h2 id="leaderboards-title" class="text-lg font-bold text-white flex items-center gap-2">
+                  <i data-lucide="trophy" class="w-5 h-5 text-amber-400"></i> Category Leaderboards
+                </h2>
+                <p class="text-xs text-slate-400 mt-1">Live standings, vote gaps, and percentages from Google Sheets.</p>
+              </div>
+              <span id="leaderboard-updated" class="text-[11px] text-slate-500 font-mono">Waiting for live data</span>
+            </div>
+            <div id="leaderboards-container" class="grid grid-cols-1 xl:grid-cols-2 gap-5"></div>
+          </section>
+
+          <!-- Visual Analytics Charts Row 1 -->
+          <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <!-- Candidate Votes Bar Chart -->
+            <div class="glass-card p-5 rounded-2xl border border-slate-800 lg:col-span-2 flex flex-col">
+              <div class="flex items-center justify-between mb-4">
+                <h3 class="text-sm font-bold text-white flex items-center gap-2">
+                  <i data-lucide="bar-chart-3" class="w-4 h-4 text-blue-400"></i> Vote Tally per Candidate
+                </h3>
+                <span class="text-[11px] text-slate-400">Bar Chart</span>
+              </div>
+              <div class="relative flex-1 min-h-[280px]">
+                <canvas id="chart-candidate-bar"></canvas>
+              </div>
+            </div>
+
+            <!-- Vote Share Doughnut Chart -->
+            <div class="glass-card p-5 rounded-2xl border border-slate-800 flex flex-col">
+              <div class="flex items-center justify-between mb-4">
+                <h3 class="text-sm font-bold text-white flex items-center gap-2">
+                  <i data-lucide="pie-chart" class="w-4 h-4 text-purple-400"></i> Vote Share Percentage
+                </h3>
+                <span class="text-[11px] text-slate-400">Distribution</span>
+              </div>
+              <div class="relative flex-1 min-h-[280px] flex items-center justify-center">
+                <canvas id="chart-share-doughnut"></canvas>
+              </div>
+            </div>
+          </div>
+
+          <!-- Analytics Charts Row 2: Voting Trend Line -->
+          <div class="glass-card p-5 rounded-2xl border border-slate-800">
+            <div class="flex items-center justify-between mb-4">
+              <h3 class="text-sm font-bold text-white flex items-center gap-2">
+                <i data-lucide="trending-up" class="w-4 h-4 text-emerald-400"></i> Voting Activity Timeline
+              </h3>
+              <span class="text-[11px] text-slate-400">Time-series Breakdown</span>
+            </div>
+            <div class="relative min-h-[220px]">
+              <canvas id="chart-timeline-line"></canvas>
+            </div>
+          </div>
+        </div>
+
+        <!-- Dashboard View 2: Live Vote Records Table -->
+        <div id="tab-records" class="hidden p-6 space-y-4">
+          <div class="glass-card p-5 rounded-2xl border border-slate-800">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4">
+              <div>
+                <h3 class="text-base font-bold text-white">Live Ballot Log</h3>
+                <p class="text-xs text-slate-400">Auditable realtime records streamed directly from Google Sheets</p>
+              </div>
+              
+              <!-- Search and Filter Controls -->
+              <div class="flex items-center gap-2">
+                <div class="relative">
+                  <i data-lucide="search" class="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"></i>
+                  <input 
+                    type="text" 
+                    id="table-search-input" 
+                    oninput="renderTableData()" 
+                    placeholder="Search candidate, voter or position..." 
+                    class="bg-slate-900 border border-slate-700/80 rounded-xl py-1.5 pl-9 pr-3 text-xs text-white focus:outline-none focus:border-blue-500 w-64"
+                  />
+                </div>
+              </div>
+            </div>
+
+            <!-- Table Container -->
+            <div class="overflow-x-auto rounded-xl border border-slate-800">
+              <table class="w-full text-left text-xs">
+                <thead class="bg-slate-900/90 text-slate-400 uppercase text-[10px] tracking-wider border-b border-slate-800">
+                  <tr>
+                    <th class="p-3 font-semibold">Timestamp</th>
+                    <th class="p-3 font-semibold">Voter ID</th>
+                    <th class="p-3 font-semibold">Voter Name</th>
+                    <th class="p-3 font-semibold">Email</th>
+                    <th class="p-3 font-semibold">Position</th>
+                    <th class="p-3 font-semibold">Candidate Selected</th>
+                    <th class="p-3 font-semibold text-right">Verification Status</th>
+                  </tr>
+                </thead>
+                <tbody id="table-votes-body" class="divide-y divide-slate-800/60 font-mono text-slate-300">
+                  <!-- Dynamic rows generated via JS -->
+                </tbody>
+              </table>
+            </div>
+
+            <!-- Table Footer Pagination -->
+            <div class="flex items-center justify-between mt-4 text-xs text-slate-400">
+              <span id="table-pagination-info">Showing 0 entries</span>
+              <div class="flex items-center gap-2">
+                <button id="btn-prev-page" onclick="changePage(-1)" class="px-3 py-1 bg-slate-900 hover:bg-slate-800 border border-slate-800 rounded-lg disabled:opacity-50">Previous</button>
+                <span id="page-number-display" class="font-semibold text-slate-200">1</span>
+                <button id="btn-next-page" onclick="changePage(1)" class="px-3 py-1 bg-slate-900 hover:bg-slate-800 border border-slate-800 rounded-lg disabled:opacity-50">Next</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Dashboard View 3: Google Apps Script Backend Code & Setup -->
+        <div id="tab-setup" class="hidden p-6 space-y-6">
+          <div class="glass-card p-6 rounded-2xl border border-slate-800 space-y-6">
+            <div>
+              <h2 class="text-lg font-bold text-white flex items-center gap-2">
+                <i data-lucide="cloud" class="w-5 h-5 text-blue-400"></i> Live Google Apps Script Backend
+              </h2>
+              <p class="text-xs text-slate-400 mt-1">This portal is connected to the currently deployed Google Apps Script web app.</p>
+            </div>
+
+            <div class="relative">
+              <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 text-sm text-slate-300 leading-relaxed">
+                <p class="font-semibold text-white">Live backend already deployed</p>
+                <p class="mt-2">This portal uses the current Google Apps Script deployment configured below. The backend source code is managed in Google Apps Script and is not duplicated in this webpage.</p>
+                <p class="mt-2 break-all font-mono text-xs text-blue-300">https://script.google.com/macros/s/AKfycbzerQtliIgNWNHoTuJZwHGK3MsQ4RZ2Ja3aVAhEYDO8HnReG_y_sRFVsnUm8Sp64xJtgA/exec</p>
+              </div>
+            </div>
+
+            <!-- Setup Steps Checklist -->
+            <div class="space-y-4 pt-4 border-t border-slate-800">
+              <h3 class="text-sm font-bold text-white">Google Sheet & Apps Script Deployment Instructions</h3>
+              <ol class="list-decimal list-inside space-y-2 text-xs text-slate-300 leading-relaxed">
+                <li>Keep the <strong>Votes</strong> sheet tab available in the connected spreadsheet.</li>
+                <li>The sheet should use columns for Timestamp, Voter ID, Full Name, Email, President, Vice President, Secretary, Treasurer, and Receipt Token.</li>
+                <li>Use the deployed Google Apps Script backend shown above.</li>
+                <li>Live records and category leaderboards refresh automatically every 10 seconds.</li>
+              </ol>
+            </div>
+          </div>
+        </div>
+
+      </main>
+    </div>
+
+  </div>
+
+  <!-- JavaScript Application Logic -->
+  <script>
+    // Global Application State
+    const state = {
+      mode: 'gas',
+      gasUrl: 'https://script.google.com/macros/s/AKfycbzerQtliIgNWNHoTuJZwHGK3MsQ4RZ2Ja3aVAhEYDO8HnReG_y_sRFVsnUm8Sp64xJtgA/exec',
+      authToken: sessionStorage.getItem('vote_admin_token') || null,
+      activeTab: 'analytics',
+      
+      // Auto Refresh Controls
+      refreshIntervalSec: 10,
+      countdown: 10,
+      timerId: null,
+
+      // Filter & Table Pagination
+      selectedPosition: 'ALL',
+      currentPage: 1,
+      rowsPerPage: 8,
+
+      // Data Store
+      votes: [],
+      // Chart instances
+      charts: {
+        bar: null,
+        doughnut: null,
+        line: null
+      }
+    };
+
+    // Initialize application on DOM ready
+    window.addEventListener('DOMContentLoaded', () => {
+      lucide.createIcons();
+      // Check existing session
+      if (state.authToken) {
+        showDashboardView();
+      } else {
+        showLoginView();
+      }
+    });
+
+    // Toggle Password Input Visibility
+    function togglePasswordVisibility() {
+      const passInput = document.getElementById('admin-password');
+      const eyeIcon = document.getElementById('eye-icon');
+      if (passInput.type === 'password') {
+        passInput.type = 'text';
+        eyeIcon.setAttribute('data-lucide', 'eye-off');
+      } else {
+        passInput.type = 'password';
+        eyeIcon.setAttribute('data-lucide', 'eye');
+      }
+      lucide.createIcons();
+    }
+
+    async function handleLogin(e) {
+      e.preventDefault();
+      const username = document.getElementById('admin-username').value.trim();
+      const password = document.getElementById('admin-password').value;
+      const loginBtn = document.getElementById('login-btn');
+
+      loginBtn.disabled = true;
+      loginBtn.innerHTML = `<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i> Authenticating...`;
+      lucide.createIcons();
+
+      try {
+        const resData = await requestJsonp({
+          action: 'login',
+          username: username,
+          password: password
+        });
+
+        if (resData.status === 'success') {
+          sessionStorage.setItem('vote_admin_token', resData.token);
+          state.authToken = resData.token;
+          showDashboardView();
+        } else {
+          showLoginAlert(resData.message || 'Authentication failed', 'error');
+        }
+      } catch (err) {
+        showLoginAlert('Failed to connect to authentication server. Check CORS / URL.', 'error');
+        console.error(err);
+      } finally {
+        loginBtn.disabled = false;
+        loginBtn.innerHTML = `<i data-lucide="shield-check" class="w-4 h-4"></i> Authenticate & Open Portal`;
+        lucide.createIcons();
+      }
+    }
+
+    function requestJsonp(params) {
+      return new Promise((resolve, reject) => {
+        const callbackName = `soitJsonp_${Date.now()}_${Math.random().toString(36).slice(2)}`;
+        const query = new URLSearchParams({ ...params, callback: callbackName });
+        const script = document.createElement('script');
+        const timeoutId = setTimeout(() => {
+          cleanup();
+          reject(new Error('The Apps Script request timed out.'));
+        }, 15000);
+
+        function cleanup() {
+          clearTimeout(timeoutId);
+          delete window[callbackName];
+          script.remove();
+        }
+
+        window[callbackName] = data => {
+          cleanup();
+          resolve(data);
+        };
+        script.onerror = () => {
+          cleanup();
+          reject(new Error('The Apps Script endpoint could not be reached.'));
+        };
+        script.src = `${state.gasUrl}?${query.toString()}`;
+        document.head.appendChild(script);
+      });
+    }
+
+    function showLoginAlert(msg, type) {
+      const alertBox = document.getElementById('login-alert');
+      alertBox.classList.remove('hidden', 'bg-rose-500/10', 'border-rose-500/30', 'text-rose-300');
+      alertBox.classList.add('bg-rose-500/10', 'border-rose-500/30', 'text-rose-300');
+      alertBox.innerHTML = `<i data-lucide="alert-circle" class="w-4 h-4 text-rose-400"></i> <span>${msg}</span>`;
+      lucide.createIcons();
+    }
+
+    function logout() {
+      sessionStorage.removeItem('vote_admin_token');
+      state.authToken = null;
+      clearInterval(state.timerId);
+      showLoginView();
+    }
+
+    function showLoginView() {
+      document.getElementById('view-login').classList.remove('hidden');
+      document.getElementById('view-dashboard').classList.add('hidden');
+    }
+
+    function showDashboardView() {
+      document.getElementById('view-login').classList.add('hidden');
+      document.getElementById('view-dashboard').classList.remove('hidden');
+      
+      updateBannerStatus();
+      populatePositionFilter();
+      initCharts();
+      fetchLatestData();
+      startAutoRefreshTimer();
+    }
+
+    function updateBannerStatus() {
+      const label = document.getElementById('current-mode-label');
+      const badge = document.getElementById('connection-badge');
+      if (state.mode === 'simulation') {
+        label.innerText = 'Local Simulation Mode';
+        badge.className = "inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-amber-500/10 text-amber-400 border border-amber-500/30";
+        badge.innerHTML = `<span class="w-2 h-2 rounded-full bg-amber-400 animate-ping"></span> SIMULATION MODE`;
+      } else {
+        label.innerText = 'Google Apps Script Live Mode';
+        badge.className = "inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/30";
+        badge.innerHTML = `<span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span> LIVE CONNECTED`;
+      }
+    }
+
+    async function fetchLatestData(isManual = false) {
+      const refreshIcon = document.getElementById('manual-refresh-icon');
+      if (isManual && refreshIcon) refreshIcon.classList.add('animate-spin');
+
+      if (state.mode === 'simulation') {
+        // Render current state
+        setTimeout(() => {
+          updateMetricsAndVisuals();
+          if (isManual && refreshIcon) refreshIcon.classList.remove('animate-spin');
+        }, 300);
+      } else {
+        // Fetch from GAS
+        try {
+          const json = await requestJsonp({
+            action: 'getDashboardData',
+            token: state.authToken
+          });
+
+          if (json.status === 'success' && json.data) {
+            state.votes = normalizeLiveVotes(json.data.votes || []);
+            populatePositionFilter();
+            updateMetricsAndVisuals();
+          } else if (json.message && json.message.includes('Unauthorized')) {
+            logout();
+          }
+        } catch (err) {
+          console.error('Data sync error:', err);
+        } finally {
+          if (isManual && refreshIcon) refreshIcon.classList.remove('animate-spin');
+        }
+      }
+      
+      document.getElementById('last-updated-text').innerText = new Date().toLocaleTimeString();
+      state.countdown = state.refreshIntervalSec;
+    }
+
+    function startAutoRefreshTimer() {
+      clearInterval(state.timerId);
+      state.countdown = state.refreshIntervalSec;
+      
+      state.timerId = setInterval(() => {
+        state.countdown--;
+        
+        // Update Timer UI
+        const timerText = document.getElementById('sync-timer');
+        const progressBar = document.getElementById('sync-progress');
+        if (timerText) timerText.innerText = `${state.countdown}s`;
+        if (progressBar) {
+          const pct = (state.countdown / state.refreshIntervalSec) * 100;
+          progressBar.style.width = `${pct}%`;
+        }
+
+        if (state.countdown <= 0) {
+          fetchLatestData();
+        }
+      }, 1000);
+    }
+
+    function normalizeLiveVotes(ballots) {
+      const positions = [
+        ['President', 'president'],
+        ['Vice President', 'vicePresident'],
+        ['Secretary', 'secretary'],
+        ['Treasurer', 'treasurer']
+      ];
+
+      return ballots.flatMap(ballot => positions.map(([position, field]) => ({
+        timestamp: ballot.timestamp,
+        voterId: String(ballot.voterId || ''),
+        voterName: String(ballot.voterName || ''),
+        voterEmail: String(ballot.voterEmail || ''),
+        position: position,
+        candidateName: String(ballot[field] || 'Abstain'),
+        receipt: String(ballot.receipt || '')
+      })));
+    }
+
+    function updateMetricsAndVisuals() {
+      // Filter votes based on selected position
+      let filteredVotes = state.votes;
+      if (state.selectedPosition !== 'ALL') {
+        filteredVotes = state.votes.filter(v => v.position === state.selectedPosition);
+      }
+
+      // Metric 1: Total recorded ballots, or category selections when filtered.
+      const totalBallots = new Set(state.votes.map(vote => vote.voterId)).size;
+      document.getElementById('metric-total-votes').innerText = state.selectedPosition === 'ALL' ? totalBallots : filteredVotes.length;
+
+      // Metric 2: Candidate Vote Counts & Leading Candidate
+      const counts = {};
+      filteredVotes.forEach(v => {
+        counts[v.candidateName] = (counts[v.candidateName] || 0) + 1;
+      });
+
+      let leaderName = '--';
+      let leaderCount = 0;
+      Object.keys(counts).forEach(name => {
+        if (counts[name] > leaderCount) {
+          leaderCount = counts[name];
+          leaderName = name;
+        }
+      });
+
+      const leaderPct = filteredVotes.length > 0 ? ((leaderCount / filteredVotes.length) * 100).toFixed(1) : 0;
+      document.getElementById('metric-leading-candidate').innerText = leaderName;
+      document.getElementById('metric-leading-votes').innerText = `${leaderCount} votes (${leaderPct}%)`;
+
+      // Metric 3: Active Positions Count
+      const positionsSet = new Set(state.votes.map(v => v.position));
+      document.getElementById('metric-positions-count').innerText = positionsSet.size;
+      const candidateSet = new Set(state.votes.map(v => v.candidateName).filter(Boolean));
+      document.getElementById('metric-candidates-count').innerText = candidateSet.size;
+      const todayKey = new Date().toDateString();
+      const todayVoterSet = new Set(state.votes
+        .filter(v => new Date(v.timestamp).toDateString() === todayKey)
+        .map(v => v.voterId));
+      document.getElementById('metric-votes-today').innerText = todayVoterSet.size;
+
+      // Update Chart Visualizations
+      renderCharts(counts, filteredVotes);
+      renderLeaderboards();
+
+      // Render Table Data
+      renderTableData();
+    }
+
+    function renderLeaderboards() {
+      const container = document.getElementById('leaderboards-container');
+      const categories = Array.from(new Set(state.votes.map(vote => vote.position))).filter(Boolean);
+
+      if (categories.length === 0) {
+        container.innerHTML = '<div class="xl:col-span-2 glass-card rounded-2xl border border-slate-800 p-8 text-center text-sm text-slate-500">No live votes have been recorded yet.</div>';
+        document.getElementById('leaderboard-updated').innerText = 'No live records';
+        return;
+      }
+
+      container.innerHTML = categories.map(category => {
+        const categoryVotes = state.votes.filter(vote => vote.position === category);
+        const counts = {};
+        categoryVotes.forEach(vote => {
+          counts[vote.candidateName] = (counts[vote.candidateName] || 0) + 1;
+        });
+
+        const rankings = Object.entries(counts)
+          .map(([name, votes]) => ({ name, votes }))
+          .sort((a, b) => b.votes - a.votes || a.name.localeCompare(b.name));
+        const totalVotes = categoryVotes.length;
+        const leaderVotes = rankings[0] ? rankings[0].votes : 0;
+
+        return `
+          <article class="glass-card rounded-2xl border border-slate-800 overflow-hidden">
+            <div class="p-5 border-b border-slate-800 bg-slate-900/40 flex items-start justify-between gap-4">
+              <div>
+                <p class="text-[10px] uppercase tracking-widest font-bold text-amber-400">Category</p>
+                <h3 class="text-base font-bold text-white mt-1">${escapeHtml(category)}</h3>
+              </div>
+              <div class="text-right shrink-0">
+                <p class="text-lg font-extrabold text-white">${totalVotes}</p>
+                <p class="text-[10px] text-slate-500 uppercase tracking-wider">Total votes</p>
+              </div>
+            </div>
+            <div class="p-4 space-y-3">
+              ${rankings.map((candidate, index) => renderLeaderboardCandidate(candidate, index, leaderVotes, totalVotes, category)).join('')}
+            </div>
+          </article>
+        `;
+      }).join('');
+
+      document.getElementById('leaderboard-updated').innerText = `Updated ${new Date().toLocaleTimeString()}`;
+      lucide.createIcons();
+    }
+
+    function renderLeaderboardCandidate(candidate, index, leaderVotes, totalVotes, category) {
+      const rank = index + 1;
+      const percentage = totalVotes ? (candidate.votes / totalVotes) * 100 : 0;
+      const gap = leaderVotes - candidate.votes;
+      const photo = getCandidatePhoto(candidate.name);
+      const leaderBadge = rank === 1
+        ? '<span class="inline-flex items-center gap-1 text-[10px] font-bold text-amber-300 bg-amber-500/10 border border-amber-500/30 rounded-full px-2 py-1"><i data-lucide="crown" class="w-3 h-3"></i> Currently Leading</span>'
+        : '';
+
+      return `
+        <div class="rounded-xl border ${rank === 1 ? 'border-amber-500/40 bg-amber-500/5' : 'border-slate-800 bg-slate-950/40'} p-3">
+          <div class="flex items-center gap-3">
+            <div class="w-8 h-8 shrink-0 rounded-lg ${rank === 1 ? 'bg-amber-500/20 text-amber-300' : 'bg-slate-800 text-slate-300'} flex items-center justify-center font-extrabold">${rank}</div>
+            <img src="${photo}" alt="" class="w-10 h-10 rounded-full object-cover border border-slate-700 bg-slate-800" onerror="this.src='https://placehold.co/80x80/1e293b/94a3b8?text=${encodeURIComponent(candidate.name.slice(0, 2).toUpperCase())}'">
+            <div class="min-w-0 flex-1">
+              <div class="flex flex-wrap items-center gap-2">
+                <p class="font-semibold text-white truncate">${escapeHtml(candidate.name)}</p>
+                ${leaderBadge}
+              </div>
+              <div class="mt-2 h-1.5 rounded-full bg-slate-800 overflow-hidden">
+                <div class="h-full ${rank === 1 ? 'bg-amber-400' : 'bg-blue-500'} rounded-full" style="width: ${percentage.toFixed(1)}%"></div>
+              </div>
+            </div>
+            <div class="text-right shrink-0">
+              <p class="text-lg font-extrabold text-white">${candidate.votes}</p>
+              <p class="text-[10px] text-slate-400">${percentage.toFixed(1)}%</p>
+            </div>
+          </div>
+          <div class="mt-3 flex items-center justify-between text-[10px] text-slate-500">
+            <span>${rank === 1 ? 'Lead position' : `${gap} vote${gap === 1 ? '' : 's'} behind leader`}</span>
+            <span>${category}</span>
+          </div>
+        </div>
+      `;
+    }
+
+    function getCandidatePhoto(candidateName) {
+      const photos = {
+        'Ryan Kwaindu': 'Images/Ryan.K.png',
+        'Berry Cholai': 'Images/Barry.png',
+        'Sian Papsen': 'Images/Sian.png',
+        'Christine Agua': 'Images/christine.png',
+        'Natasha Poiou': 'Images/Natasha.png',
+        'Charmine Veyave': 'Images/charmaine.png',
+        'John Taunao': 'Images/john.png',
+        'Franciscah Perama Potape': 'Images/franciscah.png'
+      };
+      return photos[candidateName] || 'https://placehold.co/80x80/1e293b/94a3b8?text=?';
+    }
+
+    function populatePositionFilter() {
+      const select = document.getElementById('position-filter-select');
+      select.innerHTML = '<option value="ALL">All Positions</option>';
+      const positions = Array.from(new Set(state.votes.map(vote => vote.position)));
+      positions.forEach(pos => {
+        const opt = document.createElement('option');
+        opt.value = pos;
+        opt.innerText = pos;
+        select.appendChild(opt);
+      });
+    }
+
+    function handlePositionFilterChange() {
+      state.selectedPosition = document.getElementById('position-filter-select').value;
+      updateMetricsAndVisuals();
+    }
+
+    function initCharts() {
+      const ctxBar = document.getElementById('chart-candidate-bar').getContext('2d');
+      const ctxDoughnut = document.getElementById('chart-share-doughnut').getContext('2d');
+      const ctxLine = document.getElementById('chart-timeline-line').getContext('2d');
+
+      state.charts.bar = new Chart(ctxBar, {
+        type: 'bar',
+        data: { labels: [], datasets: [{ label: 'Votes', data: [], backgroundColor: '#3b82f6', borderRadius: 8 }] },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { legend: { display: false } },
+          scales: {
+            x: { ticks: { color: '#94a3b8' }, grid: { display: false } },
+            y: { ticks: { color: '#94a3b8', stepSize: 1 }, grid: { color: 'rgba(255, 255, 255, 0.05)' } }
+          }
+        }
+      });
+
+      state.charts.doughnut = new Chart(ctxDoughnut, {
+        type: 'doughnut',
+        data: {
+          labels: [],
+          datasets: [{
+            data: [],
+            backgroundColor: ['#3b82f6', '#8b5cf6', '#ec4899', '#10b981', '#f59e0b', '#6366f1']
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { legend: { position: 'bottom', labels: { color: '#94a3b8', font: { size: 10 } } } }
+        }
+      });
+
+      state.charts.line = new Chart(ctxLine, {
+        type: 'line',
+        data: {
+          labels: [],
+          datasets: [{
+            label: 'Cumulative Votes',
+            data: [],
+            borderColor: '#10b981',
+            backgroundColor: 'rgba(16, 185, 129, 0.1)',
+            fill: true,
+            tension: 0.3
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { legend: { display: false } },
+          scales: {
+            x: { ticks: { color: '#94a3b8' }, grid: { display: false } },
+            y: { ticks: { color: '#94a3b8' }, grid: { color: 'rgba(255, 255, 255, 0.05)' } }
+          }
+        }
+      });
+    }
+
+    function renderCharts(counts, filteredVotes) {
+      if (!state.charts.bar) return;
+
+      const labels = Object.keys(counts);
+      const dataValues = Object.values(counts);
+
+      // Bar Chart Update
+      state.charts.bar.data.labels = labels;
+      state.charts.bar.data.datasets[0].data = dataValues;
+      state.charts.bar.update();
+
+      // Doughnut Chart Update
+      state.charts.doughnut.data.labels = labels;
+      state.charts.doughnut.data.datasets[0].data = dataValues;
+      state.charts.doughnut.update();
+
+      // Line Timeline Chart Update (Votes grouped into time buckets)
+      const timeBuckets = {};
+      filteredVotes.forEach(v => {
+        const d = new Date(v.timestamp);
+        const timeKey = `${d.getHours()}:${d.getMinutes() < 30 ? '00' : '30'}`;
+        timeBuckets[timeKey] = (timeBuckets[timeKey] || 0) + 1;
+      });
+
+      let runningTotal = 0;
+      const timelineLabels = Object.keys(timeBuckets);
+      const timelineData = timelineLabels.map(key => {
+        runningTotal += timeBuckets[key];
+        return runningTotal;
+      });
+
+      state.charts.line.data.labels = timelineLabels;
+      state.charts.line.data.datasets[0].data = timelineData;
+      state.charts.line.update();
+    }
+
+    function renderTableData() {
+      const searchInput = document.getElementById('table-search-input').value.toLowerCase();
+      let filtered = state.votes.filter(v => 
+        String(v.voterId || '').toLowerCase().includes(searchInput) ||
+        String(v.voterName || '').toLowerCase().includes(searchInput) ||
+        String(v.voterEmail || '').toLowerCase().includes(searchInput) ||
+        String(v.candidateName || '').toLowerCase().includes(searchInput) ||
+        String(v.position || '').toLowerCase().includes(searchInput)
+      );
+
+      // Sort latest first
+      filtered.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+
+      // Pagination
+      const totalPages = Math.ceil(filtered.length / state.rowsPerPage) || 1;
+      if (state.currentPage > totalPages) state.currentPage = totalPages;
+
+      const startIdx = (state.currentPage - 1) * state.rowsPerPage;
+      const paginated = filtered.slice(startIdx, startIdx + state.rowsPerPage);
+
+      const tbody = document.getElementById('table-votes-body');
+      tbody.innerHTML = '';
+
+      if (paginated.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="7" class="p-6 text-center text-slate-500">No voting records found.</td></tr>`;
+      } else {
+        paginated.forEach(vote => {
+          const formattedDate = new Date(vote.timestamp).toLocaleString();
+          const tr = document.createElement('tr');
+          tr.className = "hover:bg-slate-900/40 transition";
+          tr.innerHTML = `
+            <td class="p-3 text-slate-400">${escapeHtml(formattedDate)}</td>
+            <td class="p-3 text-blue-400 font-semibold">${escapeHtml(vote.voterId)}</td>
+            <td class="p-3 text-white">${escapeHtml(vote.voterName)}</td>
+            <td class="p-3 text-slate-400">${escapeHtml(vote.voterEmail)}</td>
+            <td class="p-3"><span class="px-2 py-0.5 rounded bg-slate-800 text-slate-300 text-[10px] border border-slate-700">${escapeHtml(vote.position)}</span></td>
+            <td class="p-3 text-white font-medium">${escapeHtml(vote.candidateName)}</td>
+            <td class="p-3 text-right">
+              <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] bg-emerald-500/10 text-emerald-400 border border-emerald-500/30">
+                <i data-lucide="check-circle-2" class="w-3 h-3"></i> Verified
+              </span>
+            </td>
+          `;
+          tbody.appendChild(tr);
+        });
+      }
+
+      document.getElementById('table-pagination-info').innerText = `Showing ${filtered.length > 0 ? startIdx + 1 : 0} to ${Math.min(startIdx + state.rowsPerPage, filtered.length)} of ${filtered.length} selections`;
+      document.getElementById('page-number-display').innerText = `${state.currentPage} / ${totalPages}`;
+      document.getElementById('btn-prev-page').disabled = state.currentPage === 1;
+      document.getElementById('btn-next-page').disabled = state.currentPage === totalPages;
+
+      lucide.createIcons();
+    }
+
+    function escapeHtml(value) {
+      return String(value ?? '').replace(/[&<>'"]/g, character => ({
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        "'": '&#39;',
+        '"': '&quot;'
+      }[character]));
+    }
+
+    function changePage(delta) {
+      state.currentPage += delta;
+      renderTableData();
+    }
+    
+    function exportResultsPDF() {
+      if (!state.votes || state.votes.length === 0) {
+        alert('No live election results are available to export.');
+        return;
+      }
+
+      const categories = Array.from(new Set(state.votes.map(vote => vote.position))).filter(Boolean);
+      const totalBallots = new Set(state.votes.map(vote => vote.voterId)).size;
+      const generatedAt = new Date().toLocaleString();
+      const categoryReports = categories.map(category => {
+        const categoryVotes = state.votes.filter(vote => vote.position === category);
+        const counts = {};
+        categoryVotes.forEach(vote => {
+          counts[vote.candidateName] = (counts[vote.candidateName] || 0) + 1;
+        });
+
+        const rankings = Object.entries(counts)
+          .map(([name, votes]) => ({ name, votes }))
+          .sort((a, b) => b.votes - a.votes || a.name.localeCompare(b.name));
+        const totalVotes = categoryVotes.length;
+        const leaderVotes = rankings[0] ? rankings[0].votes : 0;
+
+        return `
+          <section class="category">
+            <div class="category-heading">
+              <h2>${escapeHtml(category)}</h2>
+              <span>${totalVotes} total vote${totalVotes === 1 ? '' : 's'}</span>
+            </div>
+            <table>
+              <thead><tr><th>Rank</th><th>Candidate</th><th>Votes</th><th>Percentage</th><th>Gap Behind Leader</th></tr></thead>
+              <tbody>
+                ${rankings.map((candidate, index) => {
+                  const gap = leaderVotes - candidate.votes;
+                  const percentage = totalVotes ? ((candidate.votes / totalVotes) * 100).toFixed(1) : '0.0';
+                  return `<tr class="${index === 0 ? 'leader' : ''}">
+                    <td>${index + 1}</td>
+                    <td>${escapeHtml(candidate.name)}${index === 0 ? ' <strong>(Currently Leading)</strong>' : ''}</td>
+                    <td>${candidate.votes}</td>
+                    <td>${percentage}%</td>
+                    <td>${index === 0 ? '-' : '-' + gap}</td>
+                  </tr>`;
+                }).join('')}
+              </tbody>
+            </table>
+          </section>
+        `;
+      }).join('');
+
+      const report = window.open('', '_blank', 'width=1000,height=800');
+      if (!report) {
+        alert('Please allow pop-ups to export the PDF report.');
+        return;
+      }
+
+      report.document.write(`<!doctype html><html><head><title>SOIT 2027 Election Results</title><style>
+        @page { size: A4; margin: 16mm; }
+        * { box-sizing: border-box; }
+        body { font-family: Arial, sans-serif; color: #172033; margin: 0; }
+        header { border-bottom: 3px solid #70152b; padding-bottom: 14px; margin-bottom: 20px; }
+        h1 { color: #70152b; margin: 0 0 6px; font-size: 24px; }
+        h2 { margin: 0; font-size: 17px; color: #70152b; }
+        p { margin: 4px 0; color: #536074; font-size: 12px; }
+        .summary { display: flex; gap: 28px; margin: 18px 0 24px; }
+        .summary strong { display: block; font-size: 20px; color: #172033; }
+        .summary span { font-size: 11px; color: #536074; text-transform: uppercase; }
+        .category { page-break-inside: avoid; margin: 0 0 24px; }
+        .category-heading { display: flex; justify-content: space-between; align-items: baseline; background: #f3f5f8; border-left: 4px solid #d4af37; padding: 10px 12px; }
+        .category-heading span { font-size: 11px; color: #536074; }
+        table { width: 100%; border-collapse: collapse; font-size: 12px; }
+        th { text-align: left; background: #172033; color: white; padding: 8px; }
+        td { border-bottom: 1px solid #dfe4ea; padding: 8px; }
+        tr.leader td { background: #fff8df; font-weight: 600; }
+        footer { border-top: 1px solid #dfe4ea; padding-top: 10px; margin-top: 24px; font-size: 10px; color: #718096; }
+      </style></head><body>
+        <header><h1>SOIT 2027 Executive Election Results</h1><p>Live results report generated ${escapeHtml(generatedAt)}</p></header>
+        <div class="summary">
+          <div><strong>${totalBallots}</strong><span>Total ballots</span></div>
+          <div><strong>${categories.length}</strong><span>Categories</span></div>
+          <div><strong>${new Set(state.votes.map(vote => vote.candidateName)).size}</strong><span>Candidates with votes</span></div>
+        </div>
+        ${categoryReports}
+        <footer>Built and deployed by DEVEH</footer>
+      </body></html>`);
+      report.document.close();
+      report.focus();
+      setTimeout(() => report.print(), 300);
+    }
+
+    // Export Data as CSV
+    function exportDataCSV() {
+      if (!state.votes || state.votes.length === 0) {
+        alert('No data to export!');
+        return;
+      }
+
+      let csvContent = "data:text/csv;charset=utf-8,Timestamp,VoterID,VoterName,Email,Position,CandidateName\n";
+      state.votes.forEach(v => {
+        const csvFields = [v.timestamp, v.voterId, v.voterName, v.voterEmail, v.position, v.candidateName]
+          .map(value => `"${String(value || '').replace(/"/g, '""')}"`);
+        csvContent += csvFields.join(',') + '\n';
+      });
+
+      const encodedUri = encodeURI(csvContent);
+      const link = document.createElement("a");
+      link.setAttribute("href", encodedUri);
+      link.setAttribute("download", `voting_export_${new Date().toISOString().slice(0,10)}.csv`);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+
+    // Switch Tab Views
+    function switchTab(tabId) {
+      state.activeTab = tabId;
+      ['analytics', 'records', 'setup'].forEach(t => {
+        document.getElementById(`tab-${t}`).classList.add('hidden');
+        document.getElementById(`nav-${t}`).className = "w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-medium text-slate-400 hover:bg-slate-900/60 hover:text-slate-200";
+      });
+
+      document.getElementById(`tab-${tabId}`).classList.remove('hidden');
+      document.getElementById(`nav-${tabId}`).className = "w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-medium bg-blue-600/20 text-blue-400 border border-blue-500/30";
+    }
+
+  </script>
+  <footer class="w-full border-t border-slate-800 bg-slate-950 py-4 text-center">
+    <p class="text-[10px] text-slate-600 font-mono">Built and deployed by DEVEH</p>
+  </footer>
+</body>
+</html>

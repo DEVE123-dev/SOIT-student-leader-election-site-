@@ -1,0 +1,855 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full bg-slate-950 text-slate-100">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SOIT 2027 Executive Election - Voter Ballot</title>
+
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            ibsu: {
+              burgundy: '#70152B',
+              burgundyDark: '#4A0C1B',
+              gold: '#D4AF37',
+              goldHover: '#B89528',
+              dark: '#121212',
+              cardBg: '#1A1D24'
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+    body { font-family: 'Inter', sans-serif; }
+    
+    .candidate-card {
+      transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    
+    .candidate-card.selected {
+      border-color: #D4AF37 !important;
+      background-color: rgba(112, 21, 43, 0.25) !important;
+      box-shadow: 0 0 20px rgba(212, 175, 55, 0.25);
+    }
+
+    .custom-scrollbar::-webkit-scrollbar {
+      width: 6px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-track {
+      background: rgba(15, 23, 42, 0.6);
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+      background: #70152B;
+      border-radius: 4px;
+    }
+  </style>
+</head>
+<body class="h-full flex flex-col font-sans antialiased bg-slate-950 text-slate-200 custom-scrollbar">
+
+  <!-- Header Branding Bar -->
+  <header class="bg-gradient-to-r from-ibsu-burgundyDark via-ibsu-burgundy to-slate-900 border-b border-ibsu-gold/30 sticky top-0 z-30 shadow-xl">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3.5 flex flex-wrap items-center justify-between gap-4">
+      
+      <!-- Logos & Title -->
+      <div class="flex items-center gap-3">
+        <div class="w-12 h-12 rounded-full bg-white/10 border-2 border-ibsu-gold p-1 flex items-center justify-center shrink-0 shadow-inner">
+          <i data-lucide="vote" class="w-6 h-6 text-ibsu-gold"></i>
+        </div>
+        <div>
+          <div class="flex items-center gap-2">
+            <span class="text-[10px] uppercase font-extrabold tracking-widest text-ibsu-gold bg-ibsu-burgundyDark/80 px-2 py-0.5 rounded border border-ibsu-gold/40">Official Election Portal</span>
+            <span class="text-[10px] text-slate-300 font-mono hidden sm:inline">IBSUniversity • SOIT</span>
+          </div>
+          <h1 class="text-base sm:text-lg font-black text-white tracking-tight">Techminds Student Association 2027 Election</h1>
+        </div>
+      </div>
+
+      <!-- Quick Status Badge -->
+      <div class="flex items-center gap-3">
+        <a href="index.html" class="text-xs bg-slate-900/80 hover:bg-slate-800 text-slate-200 border border-slate-700 px-3 py-1.5 rounded-xl flex items-center gap-1.5 transition">
+          <i data-lucide="home" class="w-3.5 h-3.5 text-ibsu-gold"></i>
+          <span>Home</span>
+        </a>
+        <div class="text-right hidden md:block">
+          <p class="text-xs font-semibold text-slate-200">School of Information Technology</p>
+          <p class="text-[10px] text-slate-400">Southern Cross University Partner</p>
+        </div>
+        <span class="text-xs text-emerald-400 border border-emerald-500/30 bg-emerald-500/10 px-3 py-1.5 rounded-xl flex items-center gap-1.5">
+          <i data-lucide="cloud" class="w-3.5 h-3.5"></i>
+          <span class="font-medium">Backend Connected</span>
+        </span>
+      </div>
+
+    </div>
+  </header>
+
+  <!-- Main Voting Content Area -->
+  <main class="flex-1 max-w-6xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+
+    <!-- Top Alert Box -->
+    <div id="voter-alert" class="hidden p-4 rounded-xl text-xs flex items-center justify-between border shadow-lg">
+      <div class="flex items-center gap-2">
+        <i data-lucide="alert-circle" id="alert-icon" class="w-5 h-5 shrink-0"></i>
+        <span id="alert-message" class="font-medium"></span>
+      </div>
+      <button onclick="dismissAlert()" class="text-slate-400 hover:text-white"><i data-lucide="x" class="w-4 h-4"></i></button>
+    </div>
+
+    <!-- Already Voted Screen (Hidden by default) -->
+    <div id="already-voted-screen" class="hidden bg-slate-900/90 border border-emerald-500/30 rounded-2xl p-8 text-center space-y-4 shadow-2xl">
+      <div class="w-16 h-16 bg-emerald-500/20 border border-emerald-500/40 rounded-full flex items-center justify-center mx-auto text-emerald-400">
+        <i data-lucide="check-circle" class="w-10 h-10"></i>
+      </div>
+      <h2 class="text-2xl font-bold text-white">Ballot Successfully Submitted!</h2>
+      <p class="text-sm text-slate-300 max-w-md mx-auto">Your vote for the 2027 Techminds Executive Election has been recorded securely into the official Google Sheet database.</p>
+      <div class="pt-2">
+        <span class="inline-block bg-slate-950 px-4 py-2 rounded-xl border border-slate-800 text-xs font-mono text-ibsu-gold">
+          Session Receipt Token: <span id="receipt-id"></span>
+        </span>
+      </div>
+    </div>
+
+    <!-- SECTION 1: Voter Identity Header Form -->
+    <section id="voter-info-section" class="bg-slate-900/80 border border-slate-800 rounded-2xl p-6 shadow-xl relative overflow-hidden">
+      <div class="absolute top-0 left-0 w-2 h-full bg-ibsu-gold"></div>
+      
+      <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6 pb-4 border-b border-slate-800">
+        <div>
+          <h2 class="text-lg font-bold text-white flex items-center gap-2">
+            <i data-lucide="user-check" class="w-5 h-5 text-ibsu-gold"></i> Step 1: Verify Voter Credentials
+          </h2>
+          <p class="text-xs text-slate-400 mt-0.5">Please enter your official student details before placing your selections.</p>
+        </div>
+        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-slate-950 border border-slate-800 text-xs text-slate-300">
+          <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+          <span>1 Ballot Allowed per Student</span>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <div>
+          <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5">Student ID Number *</label>
+          <div class="relative">
+            <i data-lucide="credit-card" class="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-500"></i>
+            <input 
+              type="text" 
+              id="input-voter-id" 
+              placeholder="e.g. 2025-SOIT-014" 
+              required
+              class="w-full bg-slate-950 border border-slate-700/80 rounded-xl py-2.5 pl-9 pr-3 text-sm text-white focus:outline-none focus:border-ibsu-gold transition font-mono"
+            />
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5">Full Student Name *</label>
+          <div class="relative">
+            <i data-lucide="user" class="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-500"></i>
+            <input 
+              type="text" 
+              id="input-voter-name" 
+              placeholder="e.g. John Doe" 
+              required
+              class="w-full bg-slate-950 border border-slate-700/80 rounded-xl py-2.5 pl-9 pr-3 text-sm text-white focus:outline-none focus:border-ibsu-gold transition"
+            />
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5">Student Email Address *</label>
+          <div class="relative">
+            <i data-lucide="mail" class="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-500"></i>
+            <input 
+              type="email" 
+              id="input-voter-email" 
+              placeholder="student@ibsu.ac.pg" 
+              required
+              class="w-full bg-slate-950 border border-slate-700/80 rounded-xl py-2.5 pl-9 pr-3 text-sm text-white focus:outline-none focus:border-ibsu-gold transition"
+            />
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 2: Nominees Ballot Grid -->
+    <form id="voting-ballot-form" onsubmit="handleBallotSubmit(event)" class="space-y-10">
+
+      <!-- CATEGORY 1: PRESIDENT -->
+      <div class="bg-slate-900/60 border border-slate-800 rounded-2xl p-6 space-y-6 relative">
+        <div class="flex items-center justify-between border-b border-slate-800 pb-4">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-xl bg-ibsu-burgundy border border-ibsu-gold/40 flex items-center justify-center text-ibsu-gold font-bold">
+              1
+            </div>
+            <div>
+              <h2 class="text-lg font-extrabold text-white">President Candidates</h2>
+              <p class="text-xs text-slate-400">Select one candidate to lead the Techminds Student Association 2027</p>
+            </div>
+          </div>
+          <span id="badge-pos-president" class="text-xs px-3 py-1 rounded-full bg-slate-800 text-slate-400 border border-slate-700 font-medium">
+            Selection Required
+          </span>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          
+          <!-- Candidate 1: Ryan Kwaindu -->
+          <div 
+            onclick="selectCandidate('president', 'cand-pres-1')" 
+            id="card-pres-1"
+            class="candidate-card bg-slate-900 border border-slate-800 rounded-2xl p-5 cursor-pointer hover:border-slate-600 relative flex flex-col justify-between"
+          >
+            <div class="space-y-4">
+              <div class="flex items-start justify-between gap-4">
+                <!-- Avatar Frame -->
+                <div class="relative shrink-0">
+                  <div class="w-20 h-20 rounded-full bg-gradient-to-br from-ibsu-burgundy to-slate-800 p-0.5 border-2 border-ibsu-gold/60 overflow-hidden flex items-center justify-center shadow-lg">
+                    <img 
+                      src="images/Ryan.K.png" 
+                      alt="Ryan Kwaindu"
+                      id="img-pres-1"
+                      class="w-full h-full object-cover rounded-full"
+                      onerror="this.src='https://placehold.co/150x150/70152B/FFFFFF?text=RK'"
+                    />
+                  </div>
+                  <span class="absolute -bottom-1 -right-1 bg-ibsu-burgundy text-ibsu-gold text-[9px] font-bold px-1.5 py-0.5 rounded-full border border-ibsu-gold/50">#1</span>
+                </div>
+
+                <!-- Info Header -->
+                <div class="flex-1 min-w-0">
+                  <span class="inline-block text-[10px] font-bold text-ibsu-gold bg-ibsu-burgundy/40 px-2 py-0.5 rounded border border-ibsu-gold/20 mb-1">
+                    Candidate #1
+                  </span>
+                  <h3 class="text-base font-bold text-white truncate">Ryan Kwaindu</h3>
+                  <p class="text-xs text-slate-400">Year 1 | Bachelor of Information Tech</p>
+                </div>
+
+                <!-- Radio Button Indicator -->
+                <input type="radio" name="pres_choice" value="Ryan Kwaindu" id="cand-pres-1" class="w-5 h-5 accent-ibsu-gold shrink-0 cursor-pointer pointer-events-none" />
+              </div>
+
+              <!-- Candidate Manifesto & Bio -->
+              <div class="bg-slate-950/70 rounded-xl p-3 border border-slate-800 text-xs text-slate-300 space-y-1.5 leading-relaxed">
+                <p class="font-semibold text-ibsu-gold text-[11px]">About the Nominee:</p>
+                <p class="italic">"I'm straightforward and don't exactly have a filter. I speak my mind, but behind that, I genuinely care about the people around me."</p>
+                <p class="font-semibold text-ibsu-gold text-[11px] pt-1">Why Contesting:</p>
+                <p>"SOIT needs someone who will actually speak up. If something affects us as students, I'll say something about it."</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Candidate 2: Berry Cholai -->
+          <div 
+            onclick="selectCandidate('president', 'cand-pres-2')" 
+            id="card-pres-2"
+            class="candidate-card bg-slate-900 border border-slate-800 rounded-2xl p-5 cursor-pointer hover:border-slate-600 relative flex flex-col justify-between"
+          >
+            <div class="space-y-4">
+              <div class="flex items-start justify-between gap-4">
+                <!-- Avatar Frame -->
+                <div class="relative shrink-0">
+                  <div class="w-20 h-20 rounded-full bg-gradient-to-br from-ibsu-burgundy to-slate-800 p-0.5 border-2 border-ibsu-gold/60 overflow-hidden flex items-center justify-center shadow-lg">
+                    <img 
+                      src="images/Barry.png" 
+                      alt="Berry Cholai"
+                      id="img-pres-2"
+                      class="w-full h-full object-cover rounded-full"
+                      onerror="this.src='https://placehold.co/150x150/70152B/FFFFFF?text=BC'"
+                    />
+                  </div>
+                  <span class="absolute -bottom-1 -right-1 bg-ibsu-burgundy text-ibsu-gold text-[9px] font-bold px-1.5 py-0.5 rounded-full border border-ibsu-gold/50">#2</span>
+                </div>
+
+                <!-- Info Header -->
+                <div class="flex-1 min-w-0">
+                  <span class="inline-block text-[10px] font-bold text-ibsu-gold bg-ibsu-burgundy/40 px-2 py-0.5 rounded border border-ibsu-gold/20 mb-1">
+                    Candidate #2
+                  </span>
+                  <h3 class="text-base font-bold text-white truncate">Berry Cholai</h3>
+                  <p class="text-xs text-slate-400">Year 3 | Bachelor of Information Tech</p>
+                </div>
+
+                <!-- Radio Button Indicator -->
+                <input type="radio" name="pres_choice" value="Berry Cholai" id="cand-pres-2" class="w-5 h-5 accent-ibsu-gold shrink-0 cursor-pointer pointer-events-none" />
+              </div>
+
+              <!-- Candidate Manifesto & Bio -->
+              <div class="bg-slate-950/70 rounded-xl p-3 border border-slate-800 text-xs text-slate-300 space-y-1.5 leading-relaxed">
+                <p class="font-semibold text-ibsu-gold text-[11px]">About the Nominee:</p>
+                <p class="italic">"Quiet and friendly person who enjoys helping others. For the past 2 years I've been my batch's representative. Interested in Networking & Cybersecurity."</p>
+                <p class="font-semibold text-ibsu-gold text-[11px] pt-1">Why Contesting:</p>
+                <p>"Nominated by people who saw leadership qualities in me. I want every student to feel comfortable talking to me, sharing ideas, or asking for help."</p>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+
+      <!-- CATEGORY 2: VICE PRESIDENT -->
+      <div class="bg-slate-900/60 border border-slate-800 rounded-2xl p-6 space-y-6 relative">
+        <div class="flex items-center justify-between border-b border-slate-800 pb-4">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-xl bg-ibsu-burgundy border border-ibsu-gold/40 flex items-center justify-center text-ibsu-gold font-bold">
+              2
+            </div>
+            <div>
+              <h2 class="text-lg font-extrabold text-white">Vice President Candidates</h2>
+              <p class="text-xs text-slate-400">Select one candidate for Vice President</p>
+            </div>
+          </div>
+          <span id="badge-pos-vp" class="text-xs px-3 py-1 rounded-full bg-slate-800 text-slate-400 border border-slate-700 font-medium">
+            Selection Required
+          </span>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          
+          <!-- Candidate 1: Sian Papsen -->
+          <div 
+            onclick="selectCandidate('vp', 'cand-vp-1')" 
+            id="card-vp-1"
+            class="candidate-card bg-slate-900 border border-slate-800 rounded-2xl p-5 cursor-pointer hover:border-slate-600 relative flex flex-col justify-between"
+          >
+            <div class="space-y-4">
+              <div class="flex items-start justify-between gap-4">
+                <div class="relative shrink-0">
+                  <div class="w-20 h-20 rounded-full bg-gradient-to-br from-ibsu-burgundy to-slate-800 p-0.5 border-2 border-ibsu-gold/60 overflow-hidden flex items-center justify-center shadow-lg">
+                    <img 
+                      src="images/Sian.png" 
+                      alt="Sian Papsen"
+                      id="img-vp-1"
+                      class="w-full h-full object-cover rounded-full"
+                      onerror="this.src='https://placehold.co/150x150/70152B/FFFFFF?text=SP'"
+                    />
+                  </div>
+                  <span class="absolute -bottom-1 -right-1 bg-ibsu-burgundy text-ibsu-gold text-[9px] font-bold px-1.5 py-0.5 rounded-full border border-ibsu-gold/50">#1</span>
+                </div>
+
+                <div class="flex-1 min-w-0">
+                  <span class="inline-block text-[10px] font-bold text-ibsu-gold bg-ibsu-burgundy/40 px-2 py-0.5 rounded border border-ibsu-gold/20 mb-1">
+                    Candidate #1
+                  </span>
+                  <h3 class="text-base font-bold text-white truncate">Sian Papsen</h3>
+                  <p class="text-xs text-slate-400">Year 2 | Bachelor of Information Tech</p>
+                </div>
+
+                <input type="radio" name="vp_choice" value="Sian Papsen" id="cand-vp-1" class="w-5 h-5 accent-ibsu-gold shrink-0 cursor-pointer pointer-events-none" />
+              </div>
+
+              <div class="bg-slate-950/70 rounded-xl p-3 border border-slate-800 text-xs text-slate-300 space-y-1.5 leading-relaxed">
+                <p class="font-semibold text-ibsu-gold text-[11px]">About the Nominee:</p>
+                <p class="italic">"I am Sian Papsen from Manus, Year 2 IT student contesting for Vice President."</p>
+                <p class="font-semibold text-ibsu-gold text-[11px] pt-1">Why Contesting:</p>
+                <p>"Committed to taking on leadership responsibilities and serving with integrity, accountability, and purpose."</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Candidate 2: Christine Agua -->
+          <div 
+            onclick="selectCandidate('vp', 'cand-vp-2')" 
+            id="card-vp-2"
+            class="candidate-card bg-slate-900 border border-slate-800 rounded-2xl p-5 cursor-pointer hover:border-slate-600 relative flex flex-col justify-between"
+          >
+            <div class="space-y-4">
+              <div class="flex items-start justify-between gap-4">
+                <div class="relative shrink-0">
+                  <div class="w-20 h-20 rounded-full bg-gradient-to-br from-ibsu-burgundy to-slate-800 p-0.5 border-2 border-ibsu-gold/60 overflow-hidden flex items-center justify-center shadow-lg">
+                    <img 
+                      src="images/christine.png" 
+                      alt="Christine Agua"
+                      id="img-vp-2"
+                      class="w-full h-full object-cover rounded-full"
+                      onerror="this.src='https://placehold.co/150x150/70152B/FFFFFF?text=CA'"
+                    />
+                  </div>
+                  <span class="absolute -bottom-1 -right-1 bg-ibsu-burgundy text-ibsu-gold text-[9px] font-bold px-1.5 py-0.5 rounded-full border border-ibsu-gold/50">#2</span>
+                </div>
+
+                <div class="flex-1 min-w-0">
+                  <span class="inline-block text-[10px] font-bold text-ibsu-gold bg-ibsu-burgundy/40 px-2 py-0.5 rounded border border-ibsu-gold/20 mb-1">
+                    Candidate #2
+                  </span>
+                  <h3 class="text-base font-bold text-white truncate">Christine Agua</h3>
+                  <p class="text-xs text-slate-400">Year 1 | Bachelor of Information Tech</p>
+                </div>
+
+                <input type="radio" name="vp_choice" value="Christine Agua" id="cand-vp-2" class="w-5 h-5 accent-ibsu-gold shrink-0 cursor-pointer pointer-events-none" />
+              </div>
+
+              <div class="bg-slate-950/70 rounded-xl p-3 border border-slate-800 text-xs text-slate-300 space-y-1.5 leading-relaxed">
+                <p class="font-semibold text-ibsu-gold text-[11px]">About the Nominee:</p>
+                <p class="italic">"From Chimbu Province. Runner-up Miss IBSU. I view challenges as opportunities to learn, grow, and serve others better."</p>
+                <p class="font-semibold text-ibsu-gold text-[11px] pt-1">Why Contesting:</p>
+                <p>"Good leadership starts with taking the first step. I want to serve, support, and represent SOIT students."</p>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+
+      <!-- CATEGORY 3: SECRETARY -->
+      <div class="bg-slate-900/60 border border-slate-800 rounded-2xl p-6 space-y-6 relative">
+        <div class="flex items-center justify-between border-b border-slate-800 pb-4">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-xl bg-ibsu-burgundy border border-ibsu-gold/40 flex items-center justify-center text-ibsu-gold font-bold">
+              3
+            </div>
+            <div>
+              <h2 class="text-lg font-extrabold text-white">Secretary Candidates</h2>
+              <p class="text-xs text-slate-400">Select one candidate for Association Secretary</p>
+            </div>
+          </div>
+          <span id="badge-pos-sec" class="text-xs px-3 py-1 rounded-full bg-slate-800 text-slate-400 border border-slate-700 font-medium">
+            Selection Required
+          </span>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          
+          <!-- Candidate 1: Natasha Poiou -->
+          <div 
+            onclick="selectCandidate('sec', 'cand-sec-1')" 
+            id="card-sec-1"
+            class="candidate-card bg-slate-900 border border-slate-800 rounded-2xl p-5 cursor-pointer hover:border-slate-600 relative flex flex-col justify-between"
+          >
+            <div class="space-y-4">
+              <div class="flex items-start justify-between gap-4">
+                <div class="relative shrink-0">
+                  <div class="w-20 h-20 rounded-full bg-gradient-to-br from-ibsu-burgundy to-slate-800 p-0.5 border-2 border-ibsu-gold/60 overflow-hidden flex items-center justify-center shadow-lg">
+                    <img 
+                      src="images/Natasha.png" 
+                      alt="Natasha Poiou"
+                      id="img-sec-1"
+                      class="w-full h-full object-cover rounded-full"
+                      onerror="this.src='https://placehold.co/150x150/70152B/FFFFFF?text=NP'"
+                    />
+                  </div>
+                  <span class="absolute -bottom-1 -right-1 bg-ibsu-burgundy text-ibsu-gold text-[9px] font-bold px-1.5 py-0.5 rounded-full border border-ibsu-gold/50">#1</span>
+                </div>
+
+                <div class="flex-1 min-w-0">
+                  <span class="inline-block text-[10px] font-bold text-ibsu-gold bg-ibsu-burgundy/40 px-2 py-0.5 rounded border border-ibsu-gold/20 mb-1">
+                    Candidate #1
+                  </span>
+                  <h3 class="text-base font-bold text-white truncate">Natasha Poiou</h3>
+                  <p class="text-xs text-slate-400">Year 2 | Bachelor of Information Tech</p>
+                </div>
+
+                <input type="radio" name="sec_choice" value="Natasha Poiou" id="cand-sec-1" class="w-5 h-5 accent-ibsu-gold shrink-0 cursor-pointer pointer-events-none" />
+              </div>
+
+              <div class="bg-slate-950/70 rounded-xl p-3 border border-slate-800 text-xs text-slate-300 space-y-1.5 leading-relaxed">
+                <p class="font-semibold text-ibsu-gold text-[11px]">About the Nominee:</p>
+                <p class="italic">"From Manus and Milne Bay. I value commitment, accountability, transparency, hard work, critical thinking, and teamwork."</p>
+                <p class="font-semibold text-ibsu-gold text-[11px] pt-1">Why Contesting:</p>
+                <p>"I want to support our executive team and members by being a reliable, detail-oriented, and dependable member."</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Candidate 2: Charmine Veyave -->
+          <div 
+            onclick="selectCandidate('sec', 'cand-sec-2')" 
+            id="card-sec-2"
+            class="candidate-card bg-slate-900 border border-slate-800 rounded-2xl p-5 cursor-pointer hover:border-slate-600 relative flex flex-col justify-between"
+          >
+            <div class="space-y-4">
+              <div class="flex items-start justify-between gap-4">
+                <div class="relative shrink-0">
+                  <div class="w-20 h-20 rounded-full bg-gradient-to-br from-ibsu-burgundy to-slate-800 p-0.5 border-2 border-ibsu-gold/60 overflow-hidden flex items-center justify-center shadow-lg">
+                    <img 
+                      src="images/charmaine.png" 
+                      alt="Charmine Veyave"
+                      id="img-sec-2"
+                      class="w-full h-full object-cover rounded-full"
+                      onerror="this.src='https://placehold.co/150x150/70152B/FFFFFF?text=CV'"
+                    />
+                  </div>
+                  <span class="absolute -bottom-1 -right-1 bg-ibsu-burgundy text-ibsu-gold text-[9px] font-bold px-1.5 py-0.5 rounded-full border border-ibsu-gold/50">#2</span>
+                </div>
+
+                <div class="flex-1 min-w-0">
+                  <span class="inline-block text-[10px] font-bold text-ibsu-gold bg-ibsu-burgundy/40 px-2 py-0.5 rounded border border-ibsu-gold/20 mb-1">
+                    Candidate #2
+                  </span>
+                  <h3 class="text-base font-bold text-white truncate">Charmine Veyave</h3>
+                  <p class="text-xs text-slate-400">Year 1 | Bachelor of Information Tech</p>
+                </div>
+
+                <input type="radio" name="sec_choice" value="Charmine Veyave" id="cand-sec-2" class="w-5 h-5 accent-ibsu-gold shrink-0 cursor-pointer pointer-events-none" />
+              </div>
+
+              <div class="bg-slate-950/70 rounded-xl p-3 border border-slate-800 text-xs text-slate-300 space-y-1.5 leading-relaxed">
+                <p class="font-semibold text-ibsu-gold text-[11px]">About the Nominee:</p>
+                <p class="italic">"From New Ireland, Oro and Chimbu. Passionate about technology and personal growth."</p>
+                <p class="font-semibold text-ibsu-gold text-[11px] pt-1">Why Contesting:</p>
+                <p>"Not for a title, but to serve. I want to be the voice for my fellow students and ensure information reaches everyone on time."</p>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+
+      <!-- CATEGORY 4: TREASURER -->
+      <div class="bg-slate-900/60 border border-slate-800 rounded-2xl p-6 space-y-6 relative">
+        <div class="flex items-center justify-between border-b border-slate-800 pb-4">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-xl bg-ibsu-burgundy border border-ibsu-gold/40 flex items-center justify-center text-ibsu-gold font-bold">
+              4
+            </div>
+            <div>
+              <h2 class="text-lg font-extrabold text-white">Treasurer Candidates</h2>
+              <p class="text-xs text-slate-400">Select one candidate for Association Treasurer</p>
+            </div>
+          </div>
+          <span id="badge-pos-treas" class="text-xs px-3 py-1 rounded-full bg-slate-800 text-slate-400 border border-slate-700 font-medium">
+            Selection Required
+          </span>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          
+          <!-- Candidate 1: John Taunao -->
+          <div 
+            onclick="selectCandidate('treas', 'cand-treas-1')" 
+            id="card-treas-1"
+            class="candidate-card bg-slate-900 border border-slate-800 rounded-2xl p-5 cursor-pointer hover:border-slate-600 relative flex flex-col justify-between"
+          >
+            <div class="space-y-4">
+              <div class="flex items-start justify-between gap-4">
+                <div class="relative shrink-0">
+                  <div class="w-20 h-20 rounded-full bg-gradient-to-br from-ibsu-burgundy to-slate-800 p-0.5 border-2 border-ibsu-gold/60 overflow-hidden flex items-center justify-center shadow-lg">
+                    <img 
+                      src="images/john.png" 
+                      alt="John Taunao"
+                      id="img-treas-1"
+                      class="w-full h-full object-cover rounded-full"
+                      onerror="this.src='https://placehold.co/150x150/70152B/FFFFFF?text=JT'"
+                    />
+                  </div>
+                  <span class="absolute -bottom-1 -right-1 bg-ibsu-burgundy text-ibsu-gold text-[9px] font-bold px-1.5 py-0.5 rounded-full border border-ibsu-gold/50">#1</span>
+                </div>
+
+                <div class="flex-1 min-w-0">
+                  <span class="inline-block text-[10px] font-bold text-ibsu-gold bg-ibsu-burgundy/40 px-2 py-0.5 rounded border border-ibsu-gold/20 mb-1">
+                    Candidate #1
+                  </span>
+                  <h3 class="text-base font-bold text-white truncate">John Taunao</h3>
+                  <p class="text-xs text-slate-400">Year 2 | Bachelor of Information Tech</p>
+                </div>
+
+                <input type="radio" name="treas_choice" value="John Taunao" id="cand-treas-1" class="w-5 h-5 accent-ibsu-gold shrink-0 cursor-pointer pointer-events-none" />
+              </div>
+
+              <div class="bg-slate-950/70 rounded-xl p-3 border border-slate-800 text-xs text-slate-300 space-y-1.5 leading-relaxed">
+                <p class="font-semibold text-ibsu-gold text-[11px]">About the Nominee:</p>
+                <p class="italic">"From Hanuabada Village, NCD. Organized, responsible, detail-oriented with strong skills in accountability."</p>
+                <p class="font-semibold text-ibsu-gold text-[11px] pt-1">Why Contesting:</p>
+                <p>"To lead with transparency, accountability, and integrity. Ensuring every toea is used wisely through disciplined financial management."</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Candidate 2: Franciscah Perama Potape -->
+          <div 
+            onclick="selectCandidate('treas', 'cand-treas-2')" 
+            id="card-treas-2"
+            class="candidate-card bg-slate-900 border border-slate-800 rounded-2xl p-5 cursor-pointer hover:border-slate-600 relative flex flex-col justify-between"
+          >
+            <div class="space-y-4">
+              <div class="flex items-start justify-between gap-4">
+                <div class="relative shrink-0">
+                  <div class="w-20 h-20 rounded-full bg-gradient-to-br from-ibsu-burgundy to-slate-800 p-0.5 border-2 border-ibsu-gold/60 overflow-hidden flex items-center justify-center shadow-lg">
+                    <img 
+                      src="images/franciscah.png" 
+                      alt="Franciscah Perama Potape"
+                      id="img-treas-2"
+                      class="w-full h-full object-cover rounded-full"
+                      onerror="this.src='https://placehold.co/150x150/70152B/FFFFFF?text=FP'"
+                    />
+                  </div>
+                  <span class="absolute -bottom-1 -right-1 bg-ibsu-burgundy text-ibsu-gold text-[9px] font-bold px-1.5 py-0.5 rounded-full border border-ibsu-gold/50">#2</span>
+                </div>
+
+                <div class="flex-1 min-w-0">
+                  <span class="inline-block text-[10px] font-bold text-ibsu-gold bg-ibsu-burgundy/40 px-2 py-0.5 rounded border border-ibsu-gold/20 mb-1">
+                    Candidate #2
+                  </span>
+                  <h3 class="text-base font-bold text-white truncate">Franciscah Perama Potape</h3>
+                  <p class="text-xs text-slate-400">Year 1 | Bachelor of Information Tech</p>
+                </div>
+
+                <input type="radio" name="treas_choice" value="Franciscah Perama Potape" id="cand-treas-2" class="w-5 h-5 accent-ibsu-gold shrink-0 cursor-pointer pointer-events-none" />
+              </div>
+
+              <div class="bg-slate-950/70 rounded-xl p-3 border border-slate-800 text-xs text-slate-300 space-y-1.5 leading-relaxed">
+                <p class="font-semibold text-ibsu-gold text-[11px]">About the Nominee:</p>
+                <p class="italic">"From Hela, Enga and Southern Highlands. 5th child of 12 siblings. Attended Sogeri NSOE."</p>
+                <p class="font-semibold text-ibsu-gold text-[11px] pt-1">Why Contesting:</p>
+                <p>"To challenge myself and build skills in financial management and budget handling while contributing positively to students."</p>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Bottom Floating Submission & Progress Bar -->
+      <div class="sticky bottom-4 z-20 bg-slate-900/95 border border-ibsu-gold/40 backdrop-blur-md rounded-2xl p-4 shadow-2xl flex flex-col sm:flex-row items-center justify-between gap-4">
+        
+        <!-- Selection Progress Bar -->
+        <div class="w-full sm:w-auto flex items-center gap-3">
+          <div class="w-10 h-10 rounded-full bg-ibsu-burgundy/50 border border-ibsu-gold text-ibsu-gold flex items-center justify-center font-bold text-xs shrink-0">
+            <span id="progress-text">0/4</span>
+          </div>
+          <div>
+            <p class="text-xs font-bold text-white">Ballot Completion Status</p>
+            <p id="progress-subtitle" class="text-[11px] text-slate-400">Select candidate for each position above</p>
+          </div>
+        </div>
+
+        <!-- Submit Button -->
+        <button 
+          type="submit" 
+          id="btn-submit-ballot"
+          class="w-full sm:w-auto bg-gradient-to-r from-ibsu-burgundy to-red-800 hover:from-ibsu-burgundyDark hover:to-ibsu-burgundy text-ibsu-gold border border-ibsu-gold/60 font-bold text-sm px-8 py-3 rounded-xl shadow-lg transition flex items-center justify-center gap-2"
+        >
+          <i data-lucide="send" class="w-4 h-4"></i> Cast Official Ballot
+        </button>
+
+      </div>
+
+    </form>
+
+  </main>
+
+  <!-- JavaScript Application Logic -->
+  <script>
+    // Application State
+    const ballotState = {
+      gasUrl: 'https://script.google.com/macros/s/AKfycbzerQtliIgNWNHoTuJZwHGK3MsQ4RZ2Ja3aVAhEYDO8HnReG_y_sRFVsnUm8Sp64xJtgA/exec',
+      selections: {
+        president: null,
+        vp: null,
+        sec: null,
+        treas: null
+      }
+    };
+
+    window.addEventListener('DOMContentLoaded', () => {
+      lucide.createIcons();
+      checkAlreadyVoted();
+    });
+
+    function checkAlreadyVoted() {
+      const receipt = localStorage.getItem('soit_vote_receipt');
+      if (receipt) {
+        document.getElementById('voter-info-section').classList.add('hidden');
+        document.getElementById('voting-ballot-form').classList.add('hidden');
+        document.getElementById('already-voted-screen').classList.remove('hidden');
+        document.getElementById('receipt-id').innerText = receipt;
+      }
+    }
+
+    function selectCandidate(positionKey, radioId) {
+      const radio = document.getElementById(radioId);
+      if (!radio) return;
+
+      radio.checked = true;
+      ballotState.selections[positionKey] = radio.value;
+
+      // Update Card Visual Styling
+      const cardPrefix = radioId.replace('cand-', 'card-');
+      
+      // Clear sibling selections in the same position
+      document.querySelectorAll(`[id^="card-${positionKey}-"]`).forEach(card => {
+        card.classList.remove('selected');
+      });
+
+      const selectedCard = document.getElementById(cardPrefix);
+      if (selectedCard) {
+        selectedCard.classList.add('selected');
+      }
+
+      // Update Category Badge Indicator
+      const badgeId = {
+        president: 'badge-pos-president',
+        vp: 'badge-pos-vp',
+        sec: 'badge-pos-sec',
+        treas: 'badge-pos-treas'
+      }[positionKey];
+
+      const badge = document.getElementById(badgeId);
+      if (badge) {
+        badge.className = "text-xs px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 font-medium";
+        badge.innerText = "✓ Choice Selected";
+      }
+
+      updateProgressBar();
+    }
+
+    function updateProgressBar() {
+      const selectedCount = Object.values(ballotState.selections).filter(Boolean).length;
+      document.getElementById('progress-text').innerText = `${selectedCount}/4`;
+
+      const subtitle = document.getElementById('progress-subtitle');
+      if (selectedCount === 4) {
+        subtitle.innerText = "All categories selected! Ready to submit.";
+        subtitle.className = "text-[11px] text-emerald-400 font-semibold";
+      } else {
+        subtitle.innerText = `Please select ${4 - selectedCount} more position candidate(s).`;
+        subtitle.className = "text-[11px] text-slate-400";
+      }
+    }
+
+    async function handleBallotSubmit(e) {
+      e.preventDefault();
+
+      const voterId = document.getElementById('input-voter-id').value.trim();
+      const voterName = document.getElementById('input-voter-name').value.trim();
+      const voterEmail = document.getElementById('input-voter-email').value.trim();
+
+      // Validation Step 1: Voter Identity
+      if (!voterId || !voterName || !voterEmail) {
+        showAlert('Please fill in your Student ID, Full Name, and Email address before submitting.', 'error');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+        return;
+      }
+
+      // Validation Step 2: All 4 Positions Selected
+      const missingPositions = [];
+      if (!ballotState.selections.president) missingPositions.push('President');
+      if (!ballotState.selections.vp) missingPositions.push('Vice President');
+      if (!ballotState.selections.sec) missingPositions.push('Secretary');
+      if (!ballotState.selections.treas) missingPositions.push('Treasurer');
+
+      if (missingPositions.length > 0) {
+        showAlert(`Please cast your vote for all positions. Missing: ${missingPositions.join(', ')}`, 'error');
+        return;
+      }
+
+      const submitBtn = document.getElementById('btn-submit-ballot');
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = `<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i> Encrypting & Submitting...`;
+      lucide.createIcons();
+
+      const payload = {
+        action: 'submitVote',
+        voterId: voterId,
+        voterName: voterName,
+        voterEmail: voterEmail,
+        president: ballotState.selections.president,
+        vicePresident: ballotState.selections.vp,
+        secretary: ballotState.selections.sec,
+        treasurer: ballotState.selections.treas,
+        timestamp: new Date().toISOString()
+      };
+
+      try {
+        if (!ballotState.gasUrl) {
+          throw new Error('Voting service is not configured.');
+        }
+
+        const response = await requestVoteJsonp(payload);
+        if (response.status !== 'success') {
+          showAlert(response.message || 'Your ballot was not accepted.', 'error');
+          return;
+        }
+
+        const receipt = response.receipt || 'SOIT-2027-' + Math.floor(100000 + Math.random() * 900000);
+        localStorage.setItem('soit_vote_receipt', receipt);
+
+        // Show Success
+        document.getElementById('voter-info-section').classList.add('hidden');
+        document.getElementById('voting-ballot-form').classList.add('hidden');
+        document.getElementById('already-voted-screen').classList.remove('hidden');
+        document.getElementById('receipt-id').innerText = receipt;
+        
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+
+      } catch (err) {
+        console.error('Submission error:', err);
+        showAlert('An issue occurred while recording your ballot. Please try again.', 'error');
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = `<i data-lucide="send" class="w-4 h-4"></i> Cast Official Ballot`;
+        lucide.createIcons();
+      }
+    }
+
+    function requestVoteJsonp(payload) {
+      return new Promise((resolve, reject) => {
+        const callbackName = `soitVoteJsonp_${Date.now()}_${Math.random().toString(36).slice(2)}`;
+        const query = new URLSearchParams({ ...payload, callback: callbackName });
+        const script = document.createElement('script');
+        const timeoutId = setTimeout(() => {
+          cleanup();
+          reject(new Error('The voting service timed out.'));
+        }, 15000);
+
+        function cleanup() {
+          clearTimeout(timeoutId);
+          delete window[callbackName];
+          script.remove();
+        }
+
+        window[callbackName] = data => {
+          cleanup();
+          resolve(data);
+        };
+        script.onerror = () => {
+          cleanup();
+          reject(new Error('The voting service could not be reached.'));
+        };
+        script.src = `${ballotState.gasUrl}?${query.toString()}`;
+        document.head.appendChild(script);
+      });
+    }
+
+    function showAlert(message, type) {
+      const box = document.getElementById('voter-alert');
+      const icon = document.getElementById('alert-icon');
+      const msg = document.getElementById('alert-message');
+
+      box.classList.remove('hidden', 'bg-rose-500/10', 'border-rose-500/30', 'text-rose-300', 'bg-emerald-500/10', 'border-emerald-500/30', 'text-emerald-300');
+
+      if (type === 'error') {
+        box.classList.add('bg-rose-500/10', 'border-rose-500/30', 'text-rose-300');
+        icon.className = 'w-5 h-5 shrink-0 text-rose-400';
+      } else {
+        box.classList.add('bg-emerald-500/10', 'border-emerald-500/30', 'text-emerald-300');
+        icon.className = 'w-5 h-5 shrink-0 text-emerald-400';
+      }
+
+      msg.innerText = message;
+    }
+
+    function dismissAlert() {
+      document.getElementById('voter-alert').classList.add('hidden');
+    }
+
+  </script>
+  <footer class="w-full border-t border-slate-800 bg-slate-950 py-4 mt-auto text-center">
+    <p class="text-[10px] text-slate-600 font-mono">Built and deployed by DEVEH</p>
+  </footer>
+</body>
+</html>
